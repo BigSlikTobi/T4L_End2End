@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Envs
+.venv/
+venv/
+.env
+
+# Tools
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Alembic
+migrations/versions/__pycache__/
+
+# OS/IDE
+.DS_Store
+.idea/
+.vscode/

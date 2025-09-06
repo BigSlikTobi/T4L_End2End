@@ -1,0 +1,72 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "t4l-end2end"
+version = "0.1.0"
+description = "End-to-end pipeline for T4L core pipeline"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pydantic>=2.7",
+  "SQLAlchemy>=2.0",
+  "alembic>=1.13",
+  "requests>=2.32",
+  "feedparser>=6.0",
+  "beautifulsoup4>=4.12",
+  "lxml>=5.2",
+  "click>=8.1",
+  "python-dotenv>=1.0",
+  "loguru>=0.7",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "pytest-cov>=5.0",
+  "mypy>=1.10",
+  "black>=24.8.0",
+  "flake8>=7.1",
+  "isort>=5.13",
+  "types-requests>=2.32",
+]
+
+[project.scripts]
+t4l = "cli:main"
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+force-exclude = "specs/.*"
+
+[tool.isort]
+profile = "black"
+line_length = 100
+src_paths = ["src", "tests"]
+skip_glob = ["specs/**"]
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "W503"]
+exclude = [".venv", "migrations", "build", "dist"]
+
+[tool.mypy]
+python_version = "3.10"
+disallow_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+no_implicit_optional = true
+strict_optional = true
+namespace_packages = true
+mypy_path = "src"
+
+[tool.hatch.build.targets.wheel]
+packages = [
+  "src/cli",
+  "src/database",
+  "src/models",
+  "src/services",
+]
