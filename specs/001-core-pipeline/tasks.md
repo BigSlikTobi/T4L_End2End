@@ -61,19 +61,19 @@
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 
 ### Contract Tests
-- [ ] T007 Write contract tests for FeedIngester interface (`tests/contract/test_feed_ingester.py`)
-- [ ] T008 Write contract tests for RelevanceFilter interface (`tests/contract/test_relevance_filter.py`)
+- [x] T007 Write contract tests for FeedIngester interface (`tests/contract/test_feed_ingester.py`)
+- [x] T008 Write contract tests for RelevanceFilter interface (`tests/contract/test_relevance_filter.py`)
 
 ### Data Model Tests
-- [ ] T009 Write Pydantic model tests for Article (`tests/unit/test_models.py`)
-- [ ] T010 Write database schema tests (SQLite parity with Supabase)
+- [x] T009 Write Pydantic model tests for Article (`tests/unit/test_models.py`)
+- [x] T010 Write database schema tests (SQLite parity with Supabase)
 
 ### Unit Tests - Core Components
-- [ ] T011 Write unit tests for feed parsing (`tests/unit/test_feed_parser.py`)
-- [ ] T012 Write unit tests for URL pattern matching (`tests/unit/test_url_filter.py`)
-- [ ] T013 Write unit tests for team/player name detection (`tests/unit/test_team_detection.py`)
-- [ ] T014 Write unit tests for LLM client mock (`tests/unit/test_llm_client.py`)
-- [ ] T015 Write unit tests for database operations (`tests/unit/test_database.py`)
+- [x] T011 Write unit tests for feed parsing (`tests/unit/test_feed_parser.py`)
+- [x] T012 Write unit tests for URL pattern matching (`tests/unit/test_url_filter.py`)
+- [x] T013 Write unit tests for team/player name detection (`tests/unit/test_team_detection.py`)
+- [x] T014 Write unit tests for LLM client mock (`tests/unit/test_llm_client.py`)
+- [x] T015 Write unit tests for database operations (`tests/unit/test_database.py`)
 
 ## Phase 3.3: Core Implementation
 
