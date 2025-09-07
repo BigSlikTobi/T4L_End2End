@@ -1,0 +1,40 @@
+# Simplified workflow using Supabase Python client directly
+name: Simple Supabase Pipeline
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  run-simple-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: simple-supabase-pipeline
+      cancel-in-progress: false
+    env:
+      # Use Supabase credentials instead of raw Postgres
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      T4L_USER_AGENT: T4L-End2End/1.0 (+https://github.com/BigSlikTobi/T4L_End2End)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run simplified pipeline with Supabase
+        run: |
+          if [ -n "${SUPABASE_URL}" ] && [ -n "${SUPABASE_ANON_KEY}" ]; then
+            python -m src.cli simple-pipeline --config config/feeds.yaml --supabase
+          else
+            echo "❌ SUPABASE_URL and SUPABASE_ANON_KEY required"
+            exit 1
+          fi
+      - name: Summarize
+        run: |
+          echo "Simple pipeline completed at $(date -u)."
