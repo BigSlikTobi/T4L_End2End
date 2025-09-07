@@ -29,7 +29,9 @@ def test_pipeline_processes_1000_plus_under_time(monkeypatch):
     async def fake_fetch_feed(url: str) -> Dict[str, Any]:  # type: ignore[override]
         return {"url": url, "content": ""}
 
-    async def fake_extract_articles(feed: Dict[str, Any]) -> List[Dict[str, Any]]:  # type: ignore[override]
+    async def fake_extract_articles(
+        feed: Dict[str, Any]
+    ) -> List[Dict[str, Any]]:  # type: ignore[override]
         return make_items(1200)
 
     # Patch ingester methods

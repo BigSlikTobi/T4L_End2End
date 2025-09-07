@@ -3,7 +3,6 @@ from __future__ import annotations
 import inspect
 
 from src.services.feed_ingester import FeedIngester
-from src.services.sitemap_parser import fetch_sitemap
 
 
 def test_no_crawling_affordances():

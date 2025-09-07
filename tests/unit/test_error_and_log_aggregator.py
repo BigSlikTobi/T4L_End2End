@@ -13,8 +13,10 @@ def test_safe_call_ok_and_error():
 
 def test_log_aggregator_flush_counts():
     agg = LogAggregator()
-    n = agg.flush([
-        {"level": "INFO", "message": "a"},
-        {"level": "ERROR", "message": "b", "article_url": "u", "metadata": "{}"},
-    ])
+    n = agg.flush(
+        [
+            {"level": "INFO", "message": "a"},
+            {"level": "ERROR", "message": "b", "article_url": "u", "metadata": "{}"},
+        ]
+    )
     assert n == 2

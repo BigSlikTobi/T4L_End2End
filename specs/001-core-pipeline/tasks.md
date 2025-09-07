@@ -158,10 +158,10 @@ git pull
 - [x] T057 Write production deployment guide (`docs/deployment.md`)
 
 ### Final Validation
-- [ ] T058 Run full test suite with >80% coverage
-- [ ] T059 Validate constitution compliance
-- [ ] T060 Performance test with 1000+ articles
-- [ ] T061 Create demo script for stakeholders
+- [x] T058 Run full test suite with >80% coverage
+- [x] T059 Validate constitution compliance
+- [x] T060 Performance test with 1000+ articles
+- [x] T061 Create demo script for stakeholders
 
 ## Dependency Graph
 
