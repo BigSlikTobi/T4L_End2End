@@ -72,15 +72,15 @@ Example `config/feeds.yaml` entry:
 ```
 version: 1
 defaults:
-	max_parallel_fetches: 5
-	timeout: 15
+  max_parallel_fetches: 5
+  timeout: 15
 sources:
-	- name: Example Feed
-		type: rss
-		url: https://example.com/rss
-		publisher: Example
-		nfl_only: true
-		enabled: true
+  - name: Example Feed
+    type: rss
+    url: https://example.com/rss
+    publisher: Example
+    nfl_only: true
+    enabled: true
 ```
 
 NFL monthly sitemap templating:
