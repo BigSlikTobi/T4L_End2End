@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from sqlalchemy.orm import Session, sessionmaker
@@ -50,7 +50,7 @@ class ArticleRepository:
                     publisher=str(data.get("publisher") or ""),
                     publication_date=_parse_dt(data.get("publication_date")),
                     content_summary=data.get("content_summary"),
-                    created_at=datetime.utcnow(),
+                    created_at=datetime.now(timezone.utc),
                 )
                 session.add(obj)
             else:

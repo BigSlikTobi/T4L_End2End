@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import String, UniqueConstraint
+from sqlalchemy import String, UniqueConstraint, DateTime
 from sqlalchemy.orm import Mapped, Session, mapped_column, sessionmaker
 
 from ..connection import get_sessionmaker
@@ -18,7 +18,7 @@ class SourceWatermarkORM(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     source_key: Mapped[str] = mapped_column(String(255), nullable=False)
-    last_publication_date: Mapped[Optional[datetime]] = mapped_column(nullable=True)
+    last_publication_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     last_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
 
 
@@ -28,11 +28,15 @@ class WatermarkRepository:
 
     def get(self, source_key: str) -> Optional[SourceWatermarkORM]:
         with self._factory() as session:
-            return (
+            row = (
                 session.query(SourceWatermarkORM)
                 .filter(SourceWatermarkORM.source_key == source_key)
                 .one_or_none()
             )
+            # SQLite may round-trip timezone-aware datetimes as naive; coerce to UTC-aware.
+            if row and row.last_publication_date and row.last_publication_date.tzinfo is None:
+                row.last_publication_date = row.last_publication_date.replace(tzinfo=timezone.utc)
+            return row
 
     def upsert(self, source_key: str, last_publication_date: Optional[datetime], last_url: Optional[str]) -> SourceWatermarkORM:
         with self._factory() as session:
@@ -53,6 +57,8 @@ class WatermarkRepository:
                 row.last_url = last_url or row.last_url
             session.commit()
             session.refresh(row)
+            if row.last_publication_date and row.last_publication_date.tzinfo is None:
+                row.last_publication_date = row.last_publication_date.replace(tzinfo=timezone.utc)
             return row
 
 
