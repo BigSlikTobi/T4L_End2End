@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import ipaddress
 import os
 import socket
-import ipaddress
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine

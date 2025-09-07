@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+import ipaddress
 import os
+import socket
 import sys
 from logging.config import fileConfig
-import socket
-import ipaddress
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
