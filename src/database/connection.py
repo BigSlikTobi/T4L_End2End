@@ -46,7 +46,8 @@ def _prefer_ipv4(url_str: str) -> str:
     """
     try:
         u: URL = make_url(url_str)
-        if not u.drivername.startswith("postgresql"):
+        # Handle 'postgresql', 'postgresql+psycopg', or alias 'postgres' schemes
+        if "postgres" not in u.drivername:
             return url_str
         host = u.host
         if not host:
@@ -65,6 +66,12 @@ def _prefer_ipv4(url_str: str) -> str:
         ipv4 = infos[0][4][0]
         # Rebuild URL with IPv4 address
         u2 = u.set(host=ipv4)
+        # Safe, host-only debug to aid CI troubleshooting
+        try:
+            if os.getenv("GITHUB_ACTIONS") == "true" or os.getenv("T4L_DEBUG"):
+                print(f"[db] Prefer IPv4: {host} -> {ipv4}")
+        except Exception:
+            pass
         return str(u2)
     except Exception:
         return url_str

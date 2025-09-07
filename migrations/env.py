@@ -44,6 +44,11 @@ def _valid_db_url(url: str | None) -> bool:
     placeholders = ("HOST", "PORT", "USER", "PASSWORD", "DB", "<", ">")
     if any(tok in url for tok in placeholders):
         return False
+    try:
+        make_url(url)  # parse to validate
+        return True
+    except Exception:
+        return False
 
 
 def _prefer_ipv4_url(url: str) -> str:
@@ -53,7 +58,8 @@ def _prefer_ipv4_url(url: str) -> str:
     """
     try:
         u = make_url(url)
-        if not u.drivername.startswith("postgresql"):
+        # Handle 'postgresql', 'postgresql+psycopg', or alias 'postgres'
+        if "postgres" not in u.drivername:
             return url
         host = u.host
         if not host:
@@ -69,14 +75,14 @@ def _prefer_ipv4_url(url: str) -> str:
             return url
         ipv4 = infos[0][4][0]
         u2 = u.set(host=ipv4)
+        try:
+            if os.getenv("GITHUB_ACTIONS") == "true" or os.getenv("T4L_DEBUG"):
+                print(f"[alembic-env] Prefer IPv4: {host} -> {ipv4}")
+        except Exception:
+            pass
         return str(u2)
     except Exception:
         return url
-    try:
-        make_url(url)  # parse to validate
-        return True
-    except Exception:
-        return False
 
 
 def run_migrations_offline() -> None:

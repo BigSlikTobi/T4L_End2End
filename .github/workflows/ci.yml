@@ -27,6 +27,7 @@ jobs:
       - name: Migrate database (if DATABASE_URL provided)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          T4L_DEBUG: "1"
         run: |
           if [ -n "${DATABASE_URL}" ]; then
             python -m src.database.init_db
@@ -40,6 +41,7 @@ jobs:
       - name: Run pipeline (if DATABASE_URL provided)
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          T4L_DEBUG: "1"
         run: |
           if [ -n "${DATABASE_URL}" ]; then
             python -m src.cli pipeline --config config/feeds.yaml
