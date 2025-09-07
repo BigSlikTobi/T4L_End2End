@@ -119,10 +119,10 @@ git pull
 - [x] T037 Implement environment-based database switching (SQLite ↔ Supabase)
 
 ### Full Pipeline Integration
-- [ ] T038 Implement end-to-end pipeline orchestrator (`src/services/pipeline.py`)
-- [ ] T039 Implement error handling and recovery (`src/services/error_handler.py`)
-- [ ] T040 Implement structured logging (`src/services/logger.py`)
- - [ ] T040a Enforce incremental ingestion using watermarks and URL de-duplication (`src/services/pipeline.py`)
+- [x] T038 Implement end-to-end pipeline orchestrator (`src/services/pipeline.py`)
+- [x] T039 Implement error handling and recovery (`src/services/error_handler.py`)
+- [x] T040 Implement structured logging (`src/services/logger.py`)
+ - [x] T040a Enforce incremental ingestion using watermarks and URL de-duplication (`src/services/pipeline.py`)
 
 ## Phase 3.5: Integration Testing
 
