@@ -94,10 +94,10 @@ git pull
 - [x] T023 Implement LLM classification service (`src/services/llm_classifier.py`)
 
 ### Services - Storage
-- [ ] T024 Implement database connection layer (`src/database/connection.py`)
-- [ ] T025 Implement article repository (`src/database/repositories/article_repo.py`)
-- [ ] T026 Implement processing log repository (`src/database/repositories/log_repo.py`)
- - [ ] T026a Implement per-source watermark repository (latest publication_date/URL) (`src/database/repositories/watermark_repo.py`)
+- [x] T024 Implement database connection layer (`src/database/connection.py`)
+- [x] T025 Implement article repository (`src/database/repositories/article_repo.py`)
+- [x] T026 Implement processing log repository (`src/database/repositories/log_repo.py`)
+ - [x] T026a Implement per-source watermark repository (latest publication_date/URL) (`src/database/repositories/watermark_repo.py`)
 
 ### CLI Interface
 - [ ] T027 Implement CLI entry point (`src/cli/__init__.py`)
