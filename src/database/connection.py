@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import ipaddress
 import os
+import socket
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.engine.url import make_url
+from sqlalchemy.engine.url import URL, make_url
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -32,7 +34,47 @@ def get_database_url() -> str:
     DATABASE_URL=postgresql+psycopg://user:pass@host:5432/db
     """
     env_url = os.getenv("DATABASE_URL")
-    return env_url if _valid_db_url(env_url) else "sqlite:///./t4l.db"
+    url = env_url if _valid_db_url(env_url) else "sqlite:///./t4l.db"
+    return _prefer_ipv4(url)
+
+
+def _prefer_ipv4(url_str: str) -> str:
+    """If URL points to Postgres, prefer IPv4 by resolving DNS to an A record.
+
+    Some environments (e.g., GitHub runners) fail IPv6 connections. We rewrite the host
+    to the first IPv4 address when the original host is a DNS name.
+    """
+    try:
+        u: URL = make_url(url_str)
+        # Handle 'postgresql', 'postgresql+psycopg', or alias 'postgres' schemes
+        if "postgres" not in u.drivername:
+            return url_str
+        host = u.host
+        if not host:
+            return url_str
+        try:
+            # If host is already an IP (v4 or v6), keep as-is
+            ipaddress.ip_address(host)
+            return url_str
+        except ValueError:
+            pass  # not an IP literal, resolve
+
+        port = u.port or 5432
+        infos = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+        if not infos:
+            return url_str
+        ipv4 = infos[0][4][0]
+        # Rebuild URL with IPv4 address
+        u2 = u.set(host=ipv4)
+        # Safe, host-only debug to aid CI troubleshooting
+        try:
+            if os.getenv("GITHUB_ACTIONS") == "true" or os.getenv("T4L_DEBUG"):
+                print(f"[db] Prefer IPv4: {host} -> {ipv4}")
+        except Exception:
+            pass
+        return str(u2)
+    except Exception:
+        return url_str
 
 
 def get_engine(echo: bool = False) -> Engine:

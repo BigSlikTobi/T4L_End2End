@@ -9,8 +9,6 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -27,14 +25,26 @@ jobs:
           pip install flake8
           flake8
       - name: Migrate database (if DATABASE_URL provided)
-        if: ${{ env.DATABASE_URL != '' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          T4L_DEBUG: "1"
         run: |
-          python -m src.database.init_db
+          if [ -n "${DATABASE_URL}" ]; then
+            python -m src.database.init_db
+          else
+            echo "Skipping migration (no DATABASE_URL)"
+          fi
       - name: Run tests
         run: |
           pip install pytest
           pytest -q
       - name: Run pipeline (if DATABASE_URL provided)
-        if: ${{ env.DATABASE_URL != '' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          T4L_DEBUG: "1"
         run: |
-          python -m src.cli pipeline --config config/feeds.yaml
+          if [ -n "${DATABASE_URL}" ]; then
+            python -m src.cli pipeline --config config/feeds.yaml
+          else
+            echo "Skipping pipeline (no DATABASE_URL)"
+          fi

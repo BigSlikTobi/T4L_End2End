@@ -13,9 +13,6 @@ jobs:
       group: scheduled-pipeline
       cancel-in-progress: false
     env:
-      # Set this repository secret to your Supabase/Postgres connection string
-      # e.g. postgresql+psycopg://user:pass@host:5432/dbname?sslmode=require
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       # Helpful default UA for some RSS feeds (can be overridden as a secret/repo var)
       T4L_USER_AGENT: T4L-End2End/1.0 (+https://github.com/BigSlikTobi/T4L_End2End)
     steps:
@@ -29,6 +26,9 @@ jobs:
           pip install -r requirements.txt
           pip install "psycopg[binary]"
       - name: Migrate database (if DATABASE_URL provided)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          T4L_DEBUG: "1"
         run: |
           if [ -n "${DATABASE_URL}" ]; then
             python -m src.database.init_db
@@ -36,6 +36,9 @@ jobs:
             echo "Skipping migration (no DATABASE_URL)"
           fi
       - name: Run pipeline (if DATABASE_URL provided)
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          T4L_DEBUG: "1"
         run: |
           if [ -n "${DATABASE_URL}" ]; then
             python -m src.cli pipeline --config config/feeds.yaml
