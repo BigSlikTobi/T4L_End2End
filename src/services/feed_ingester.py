@@ -1,9 +1,11 @@
 import asyncio
+import os
 from typing import Any, Dict, List
 
 import requests
 
 from . import rss_parser
+from .logger import log_json
 
 
 class FeedIngester:
@@ -17,11 +19,35 @@ class FeedIngester:
 
     async def fetch_feed(self, feed_url: str) -> Dict[str, Any]:
         def _get() -> Dict[str, Any]:
-            resp = requests.get(feed_url, timeout=15)
+            headers = {
+                "User-Agent": os.getenv(
+                    "T4L_USER_AGENT",
+                    "T4L-End2End/1.0 (+https://github.com/BigSlikTobi/T4L_End2End)",
+                ),
+                "Accept": "application/rss+xml, application/xml;q=0.9, */*;q=0.8",
+            }
+            resp = requests.get(feed_url, timeout=15, headers=headers)
+            if resp.status_code != 200:
+                try:
+                    log_json(
+                        "WARNING",
+                        "feed_fetch_non_200",
+                        url=feed_url,
+                        status=resp.status_code,
+                        content_type=resp.headers.get("Content-Type"),
+                    )
+                except Exception:
+                    pass
+            text = resp.text
+            if not text and resp.content:
+                try:
+                    text = resp.content.decode(resp.encoding or "utf-8", errors="ignore")
+                except Exception:
+                    text = resp.text
             return {
                 "url": feed_url,
                 "status": resp.status_code,
-                "content": resp.text,
+                "content": text,
                 "headers": dict(resp.headers),
             }
 

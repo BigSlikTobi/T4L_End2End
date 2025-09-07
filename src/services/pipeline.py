@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime, timezone
 from typing import Any, Dict, List
 
 import yaml
@@ -24,12 +25,41 @@ class Pipeline:
         self.log_repo = ProcessingLogRepository()
         self.watermarks = WatermarkRepository()
 
-    async def run_from_config(self, config_path: str) -> Dict[str, Any]:
+    @staticmethod
+    def _to_aware_utc(dt_obj: Any | None) -> datetime | None:
+        """Coerce various datetime-like values to timezone-aware UTC datetimes.
+
+        Accepts datetime or ISO8601 string (with or without 'Z'). Returns None on failure.
+        """
+        if dt_obj is None:
+            return None
+        d: datetime | None
+        if isinstance(dt_obj, datetime):
+            d = dt_obj
+        else:
+            try:
+                d = datetime.fromisoformat(str(dt_obj).replace("Z", "+00:00"))
+            except Exception:
+                return None
+        if d.tzinfo is None:
+            return d.replace(tzinfo=timezone.utc)
+        return d.astimezone(timezone.utc)
+
+    async def run_from_config(
+        self,
+        config_path: str,
+        only_publishers: list[str] | None = None,
+        only_sources: list[str] | None = None,
+    ) -> Dict[str, Any]:
         with open(config_path, "r", encoding="utf-8") as f:
             cfg = yaml.safe_load(f)
 
         defaults = cfg.get("defaults", {})
         sources = cfg.get("sources", [])
+        if only_publishers:
+            sources = [s for s in sources if (s.get("publisher") or "").strip() in only_publishers]
+        if only_sources:
+            sources = [s for s in sources if (s.get("name") or "").strip() in only_sources]
         results: Dict[str, Any] = {"total": 0, "kept": 0, "rejected": 0, "escalated": 0}
 
         for src in sources:
@@ -110,17 +140,12 @@ class Pipeline:
         seen: set[str] = set()
 
         def newer_than_watermark(it: Dict[str, Any]) -> bool:
-            dt = it.get("publication_date")
+            dt_val = it.get("publication_date")
             url = it.get("url")
-            if last_dt and dt:
-                try:
-                    from datetime import datetime
-
-                    d = datetime.fromisoformat(str(dt).replace("Z", "+00:00"))
-                    return d > last_dt
-                except Exception:
-                    # fallback to URL check
-                    return url != last_url
+            d_curr = self._to_aware_utc(dt_val)
+            d_last = self._to_aware_utc(last_dt)
+            if d_last and d_curr:
+                return d_curr > d_last
             if last_url:
                 return url != last_url
             return True
@@ -139,7 +164,7 @@ class Pipeline:
         Metrics.counter("pipeline.items_total").inc(st["total"])
 
         # Filtering and persistence
-        newest_dt = last_dt
+        newest_dt = self._to_aware_utc(last_dt)
         newest_url = last_url
         for it in filtered_items:
             decision, score = self.filter.filter_article(it)
@@ -151,7 +176,7 @@ class Pipeline:
                     "INFO", "kept", article_url=it.get("url"), metadata=str({"score": score})
                 )
                 # watermark update candidate
-                dt = obj.publication_date
+                dt = self._to_aware_utc(obj.publication_date)
                 if dt and (newest_dt is None or dt > newest_dt):
                     newest_dt = dt
                     newest_url = obj.url

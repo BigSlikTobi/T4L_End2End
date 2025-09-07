@@ -6,6 +6,7 @@ from logging.config import fileConfig
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
+from sqlalchemy.engine.url import make_url
 
 config = context.config
 
@@ -34,8 +35,25 @@ except Exception:
 target_metadata = Base.metadata
 
 
+def _valid_db_url(url: str | None) -> bool:
+    if not url:
+        return False
+    # Quick guard against placeholder values often used in examples
+    placeholders = ("HOST", "PORT", "USER", "PASSWORD", "DB", "<", ">")
+    if any(tok in url for tok in placeholders):
+        return False
+    try:
+        make_url(url)  # parse to validate
+        return True
+    except Exception:
+        return False
+
+
 def run_migrations_offline() -> None:
-    url = os.getenv("DATABASE_URL") or config.get_main_option("sqlalchemy.url")
+    env_url = os.getenv("DATABASE_URL")
+    url = env_url if _valid_db_url(env_url) else config.get_main_option("sqlalchemy.url")
+    if env_url and not _valid_db_url(env_url):
+        print("[alembic-env] Ignoring invalid DATABASE_URL; falling back to default sqlalchemy.url")
     context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
 
     with context.begin_transaction():
@@ -44,15 +62,27 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     section = config.get_section(config.config_ini_section) or {}
-    # Override URL from env if provided
+    # Override URL from env if provided and valid; otherwise keep default
     env_url = os.getenv("DATABASE_URL")
-    if env_url:
+    if env_url and _valid_db_url(env_url):
         section["sqlalchemy.url"] = env_url
-    connectable = engine_from_config(
-        section,
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    elif env_url and not _valid_db_url(env_url):
+        print("[alembic-env] Ignoring invalid DATABASE_URL; using default from alembic.ini")
+
+    try:
+        connectable = engine_from_config(
+            section,
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
+    except Exception as exc:  # final fallback to default config
+        print(f"[alembic-env] Failed to create engine from env URL ({exc}); retrying with default")
+        fallback = config.get_section(config.config_ini_section) or {}
+        connectable = engine_from_config(
+            fallback,
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
 
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)

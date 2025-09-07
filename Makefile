@@ -1,4 +1,4 @@
-.PHONY: install lint format test alembic-init
+.PHONY: install lint format test alembic-init migrate
 
 install:
 	python -m pip install -U pip
@@ -19,3 +19,6 @@ test:
 
 alembic-init:
 	alembic revision -m "init" --autogenerate
+
+migrate:
+	python -m src.database.init_db

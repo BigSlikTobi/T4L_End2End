@@ -4,11 +4,25 @@ import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
+from sqlalchemy.engine.url import make_url
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
 # Import ORM base for optional auto-creation in lightweight SQLite setups (tests)
 from ..models.database import Base
+
+
+def _valid_db_url(url: str | None) -> bool:
+    if not url:
+        return False
+    placeholders = ("HOST", "PORT", "USER", "PASSWORD", "DB", "<", ">")
+    if any(tok in url for tok in placeholders):
+        return False
+    try:
+        make_url(url)
+        return True
+    except Exception:
+        return False
 
 
 def get_database_url() -> str:
@@ -17,7 +31,8 @@ def get_database_url() -> str:
     Supports switching to Supabase/Postgres via DATABASE_URL, e.g.,
     DATABASE_URL=postgresql+psycopg://user:pass@host:5432/db
     """
-    return os.getenv("DATABASE_URL", "sqlite:///./t4l.db")
+    env_url = os.getenv("DATABASE_URL")
+    return env_url if _valid_db_url(env_url) else "sqlite:///./t4l.db"
 
 
 def get_engine(echo: bool = False) -> Engine:

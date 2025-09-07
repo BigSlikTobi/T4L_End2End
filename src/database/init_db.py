@@ -4,6 +4,8 @@ import os
 
 from alembic import command
 from alembic.config import Config
+from alembic.util.exc import CommandError
+from sqlalchemy.exc import OperationalError
 
 
 def upgrade_to_head(alembic_ini_path: str | None = None) -> None:
@@ -11,7 +13,23 @@ def upgrade_to_head(alembic_ini_path: str | None = None) -> None:
         os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "alembic.ini"
     )
     cfg = Config(cfg_path)
-    command.upgrade(cfg, "head")
+    try:
+        command.upgrade(cfg, "head")
+        return
+    except CommandError as e:
+        msg = str(e)
+        if "Multiple head revisions" in msg or "Multiple heads" in msg:
+            # When branches exist, try upgrading all heads.
+            try:
+                command.upgrade(cfg, "heads")
+                return
+            except OperationalError as oe:
+                # If objects already exist (e.g., rerun on a pre-populated DB), stamp.
+                if "already exists" in str(oe):
+                    command.stamp(cfg, "heads")
+                    return
+                raise
+        raise
 
 
 if __name__ == "__main__":
