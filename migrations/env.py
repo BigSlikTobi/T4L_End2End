@@ -3,6 +3,8 @@ from __future__ import annotations
 import os
 import sys
 from logging.config import fileConfig
+import socket
+import ipaddress
 
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -42,6 +44,34 @@ def _valid_db_url(url: str | None) -> bool:
     placeholders = ("HOST", "PORT", "USER", "PASSWORD", "DB", "<", ">")
     if any(tok in url for tok in placeholders):
         return False
+
+
+def _prefer_ipv4_url(url: str) -> str:
+    """Rewrite Postgres URL host to IPv4 address if DNS resolves to IPv6 first.
+
+    GitHub runners often cannot reach IPv6. Resolve host to AF_INET and rebuild URL.
+    """
+    try:
+        u = make_url(url)
+        if not u.drivername.startswith("postgresql"):
+            return url
+        host = u.host
+        if not host:
+            return url
+        try:
+            ipaddress.ip_address(host)
+            return url  # already an IP literal
+        except ValueError:
+            pass
+        port = u.port or 5432
+        infos = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+        if not infos:
+            return url
+        ipv4 = infos[0][4][0]
+        u2 = u.set(host=ipv4)
+        return str(u2)
+    except Exception:
+        return url
     try:
         make_url(url)  # parse to validate
         return True
@@ -52,6 +82,7 @@ def _valid_db_url(url: str | None) -> bool:
 def run_migrations_offline() -> None:
     env_url = os.getenv("DATABASE_URL")
     url = env_url if _valid_db_url(env_url) else config.get_main_option("sqlalchemy.url")
+    url = _prefer_ipv4_url(url)
     if env_url and not _valid_db_url(env_url):
         print("[alembic-env] Ignoring invalid DATABASE_URL; falling back to default sqlalchemy.url")
     context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
@@ -65,7 +96,7 @@ def run_migrations_online() -> None:
     # Override URL from env if provided and valid; otherwise keep default
     env_url = os.getenv("DATABASE_URL")
     if env_url and _valid_db_url(env_url):
-        section["sqlalchemy.url"] = env_url
+        section["sqlalchemy.url"] = _prefer_ipv4_url(env_url)
     elif env_url and not _valid_db_url(env_url):
         print("[alembic-env] Ignoring invalid DATABASE_URL; using default from alembic.ini")
 
