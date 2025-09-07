@@ -33,7 +33,7 @@ class OpenAIClient:
         if not self._client:
             return self._offline_classify(title, url)
 
-        model_name = model or os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+        model_name = model or os.getenv("OPENAI_MODEL", "gpt-5-nano")
         prompt = (
             "Classify if the following headline+URL is NFL-related.\n"
             "Return JSON with keys label in {NFL, NON_NFL, AMBIGUOUS}, confidence [0,1], reason.\n\n"
