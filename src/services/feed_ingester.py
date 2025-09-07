@@ -1,5 +1,5 @@
 import asyncio
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import requests
 
@@ -15,9 +15,17 @@ class FeedIngester:
       - standardize_article(self, raw_article: Dict[str, Any]) -> Dict[str, Any]
     """
 
-    async def fetch_feed(self, feed_url: str) -> Dict[str, Any]:
+    async def fetch_feed(
+        self, feed_url: str, timeout: float | int = 15, user_agent: Optional[str] = None
+    ) -> Dict[str, Any]:
         def _get() -> Dict[str, Any]:
-            resp = requests.get(feed_url, timeout=15)
+            headers: Dict[str, str] = {}
+            if user_agent:
+                headers["User-Agent"] = user_agent
+                headers.setdefault(
+                    "Accept", "application/rss+xml, application/xml;q=0.9, */*;q=0.8"
+                )
+            resp = requests.get(feed_url, timeout=timeout, headers=headers or None)
             return {
                 "url": feed_url,
                 "status": resp.status_code,

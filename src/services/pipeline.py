@@ -24,12 +24,21 @@ class Pipeline:
         self.log_repo = ProcessingLogRepository()
         self.watermarks = WatermarkRepository()
 
-    async def run_from_config(self, config_path: str) -> Dict[str, Any]:
+    async def run_from_config(
+        self,
+        config_path: str,
+        only_publishers: list[str] | None = None,
+        only_sources: list[str] | None = None,
+    ) -> Dict[str, Any]:
         with open(config_path, "r", encoding="utf-8") as f:
             cfg = yaml.safe_load(f)
 
         defaults = cfg.get("defaults", {})
         sources = cfg.get("sources", [])
+        if only_publishers:
+            sources = [s for s in sources if (s.get("publisher") or "").strip() in only_publishers]
+        if only_sources:
+            sources = [s for s in sources if (s.get("name") or "").strip() in only_sources]
         results: Dict[str, Any] = {"total": 0, "kept": 0, "rejected": 0, "escalated": 0}
 
         for src in sources:
@@ -60,9 +69,14 @@ class Pipeline:
                 src.get("max_parallel_fetches", defaults.get("max_parallel_fetches", 5))
             )
             timeout = float(src.get("timeout", defaults.get("timeout", 15)))
+            user_agent = src.get("user_agent", defaults.get("user_agent"))
 
             async def _fetch_and_parse(url: str) -> List[Dict[str, Any]]:
-                f = await retry(lambda: self.ingester.fetch_feed(url), retries=2, timeout=timeout)
+                f = await retry(
+                    lambda: self.ingester.fetch_feed(url, timeout=timeout, user_agent=user_agent),
+                    retries=2,
+                    timeout=timeout,
+                )
                 return await self.ingester.extract_articles(f)
 
             # Support single or list of feeds for a source
