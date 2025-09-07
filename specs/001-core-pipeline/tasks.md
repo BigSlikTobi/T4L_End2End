@@ -82,10 +82,10 @@
 - [x] T017 Implement database models (`src/models/database.py`)
 
 ### Services - Feed Ingestion
-- [ ] T018 Implement FeedIngester concrete class (`src/services/feed_ingester.py`)
-- [ ] T019 Implement RSS feed parser (`src/services/rss_parser.py`)
-- [ ] T020 Implement sitemap parser (`src/services/sitemap_parser.py`)
- - [ ] T020a Implement dynamic sitemap URL templating (NFL monthly sitemap `{YYYY}/{MM}` from current UTC date) (`src/services/sitemap_parser.py`)
+- [x] T018 Implement FeedIngester concrete class (`src/services/feed_ingester.py`)
+- [x] T019 Implement RSS feed parser (`src/services/rss_parser.py`)
+- [x] T020 Implement sitemap parser (`src/services/sitemap_parser.py`)
+ - [x] T020a Implement dynamic sitemap URL templating (NFL monthly sitemap `{YYYY}/{MM}` from current UTC date) (`src/services/sitemap_parser.py`)
 
 ### Services - Filtering
 - [ ] T021 Implement RelevanceFilter concrete class (`src/services/relevance_filter.py`)
