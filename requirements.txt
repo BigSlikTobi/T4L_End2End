@@ -10,6 +10,7 @@ loguru>=0.7
 click>=8.1
 openai>=1.40
 supabase>=2.6
+pyyaml>=6.0
 
 # Dev
 pytest>=8.2
