@@ -21,6 +21,11 @@ def parse_feed(feed_content: str) -> List[Dict[str, Any]]:
         # propagate source if available
         if "source" in entry and hasattr(entry["source"], "title"):
             item["publisher"] = entry["source"].title
+        # Some feeds omit source; derive from feed metadata when obvious
+        if "publisher" not in item and hasattr(parsed, "feed"):
+            title = getattr(parsed.feed, "title", "") or ""
+            if "ESPN" in title.upper():
+                item["publisher"] = "ESPN"
         articles.append(item)
     return articles
 
