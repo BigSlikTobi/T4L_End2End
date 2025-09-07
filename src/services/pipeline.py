@@ -133,7 +133,7 @@ class Pipeline:
             seen.add(url)
             if not newer_than_watermark(it):
                 continue
-        filtered_items.append(it)
+            filtered_items.append(it)
 
         st["total"] = len(filtered_items)
         Metrics.counter("pipeline.items_total").inc(st["total"])
