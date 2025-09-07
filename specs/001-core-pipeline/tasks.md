@@ -100,10 +100,10 @@ git pull
  - [x] T026a Implement per-source watermark repository (latest publication_date/URL) (`src/database/repositories/watermark_repo.py`)
 
 ### CLI Interface
-- [ ] T027 Implement CLI entry point (`src/cli/__init__.py`)
-- [ ] T028 Implement ingest command (`src/cli/commands/ingest.py`)
-- [ ] T029 Implement filter command (`src/cli/commands/filter.py`)
-- [ ] T030 Implement pipeline command (`src/cli/commands/pipeline.py`)
+- [x] T027 Implement CLI entry point (`src/cli/__init__.py`)
+- [x] T028 Implement ingest command (`src/cli/commands/ingest.py`)
+- [x] T029 Implement filter command (`src/cli/commands/filter.py`)
+- [x] T030 Implement pipeline command (`src/cli/commands/pipeline.py`)
 
 ## Phase 3.4: Integration
 
