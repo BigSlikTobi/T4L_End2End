@@ -20,6 +20,9 @@ venv/
 .ruff_cache/
 .coverage
 coverage.xml
+*.db
+*.sqlite
+*.sqlite3
 
 # Alembic
 migrations/versions/__pycache__/

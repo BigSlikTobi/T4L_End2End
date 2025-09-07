@@ -108,10 +108,10 @@ git pull
 ## Phase 3.4: Integration
 
 ### Database Integration
-- [ ] T031 Create Alembic migrations for articles table (`migrations/versions/001_articles.py`)
-- [ ] T032 Create Alembic migrations for feeds table (`migrations/versions/002_feeds.py`)
-- [ ] T033 Create Alembic migrations for processing_log table (`migrations/versions/003_processing_log.py`)
-- [ ] T034 Implement database initialization script (`src/database/init_db.py`)
+- [x] T031 Create Alembic migrations for articles table (`migrations/versions/001_articles.py`)
+- [x] T032 Create Alembic migrations for feeds table (`migrations/versions/002_feeds.py`)
+- [x] T033 Create Alembic migrations for processing_log table (`migrations/versions/003_processing_log.py`)
+- [x] T034 Implement database initialization script (`src/database/init_db.py`)
 
 ### External Service Integration
 - [ ] T035 Integrate OpenAI API client (`src/services/openai_client.py`)
