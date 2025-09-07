@@ -74,6 +74,7 @@
 - [x] T013 Write unit tests for team/player name detection (`tests/unit/test_team_detection.py`)
 - [x] T014 Write unit tests for LLM client mock (`tests/unit/test_llm_client.py`)
 - [x] T015 Write unit tests for database operations (`tests/unit/test_database.py`)
+git pull
 
 ## Phase 3.3: Core Implementation
 
@@ -88,9 +89,9 @@
  - [x] T020a Implement dynamic sitemap URL templating (NFL monthly sitemap `{YYYY}/{MM}` from current UTC date) (`src/services/sitemap_parser.py`)
 
 ### Services - Filtering
-- [ ] T021 Implement RelevanceFilter concrete class (`src/services/relevance_filter.py`)
-- [ ] T022 Implement rule-based filtering logic (`src/services/rule_filter.py`)
-- [ ] T023 Implement LLM classification service (`src/services/llm_classifier.py`)
+- [x] T021 Implement RelevanceFilter concrete class (`src/services/relevance_filter.py`)
+- [x] T022 Implement rule-based filtering logic (`src/services/rule_filter.py`)
+- [x] T023 Implement LLM classification service (`src/services/llm_classifier.py`)
 
 ### Services - Storage
 - [ ] T024 Implement database connection layer (`src/database/connection.py`)
