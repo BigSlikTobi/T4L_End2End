@@ -147,9 +147,9 @@ git pull
 - [x] T050 Optimize database queries with proper indexing (Alecmbic notes and optional Postgres indexes in `migrations/versions/005_indexes_and_performance_notes.py`)
 
 ### Monitoring & Observability
-- [ ] T051 Implement health checks (`src/cli/commands/health.py`)
-- [ ] T052 Add performance metrics (`src/services/metrics.py`)
-- [ ] T053 Implement log aggregation to database (`src/services/log_aggregator.py`)
+- [x] T051 Implement health checks (`src/cli/commands/health.py`)
+- [x] T052 Add performance metrics (`src/services/metrics.py`)
+- [x] T053 Implement log aggregation to database (`src/services/log_aggregator.py`)
 
 ### Documentation & Deployment
 - [ ] T054 Create API documentation (`docs/api.md`)
