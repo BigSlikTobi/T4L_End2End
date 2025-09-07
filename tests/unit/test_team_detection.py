@@ -1,5 +1,6 @@
-import pytest
 import importlib
+
+import pytest
 
 
 def _load_filter_module():
@@ -25,4 +26,3 @@ def test_is_nfl_team_mention_examples(text, expected):
         pytest.xfail("RelevanceFilter not found (T021)")
 
     assert hasattr(cls, "is_nfl_team_mention"), "Missing is_nfl_team_mention method"
-

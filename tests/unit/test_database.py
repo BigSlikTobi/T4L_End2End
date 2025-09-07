@@ -1,5 +1,6 @@
-import pytest
 import importlib
+
+import pytest
 
 
 def _load_article_repo():
@@ -18,4 +19,3 @@ def test_article_repository_interface():
     # Expected core methods
     for name in ("upsert", "get_by_url"):
         assert hasattr(Repo, name), f"Missing repository method: {name}"
-

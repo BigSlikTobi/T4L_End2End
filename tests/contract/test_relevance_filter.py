@@ -1,7 +1,8 @@
-import inspect
 import importlib
+import inspect
+from typing import Any, Dict
+
 import pytest
-from typing import Dict, Any, Tuple
 
 
 def _load_relevance_filter_module():
@@ -49,9 +50,10 @@ def test_relevance_filter_method_signatures_and_types():
     params = list(sig.parameters.values())
     assert len(params) == 2, "filter_article(self, article: Dict[str, Any]) expected"
     hints = getattr(filter_article, "__annotations__", {})
-    assert hints.get("article") in (Dict[str, Any], dict), (
-        "filter_article should annotate article: Dict[str, Any] per contract"
-    )
+    assert hints.get("article") in (
+        Dict[str, Any],
+        dict,
+    ), "filter_article should annotate article: Dict[str, Any] per contract"
     ret = hints.get("return")
     # Tuple[FilterDecision, float] is expected; accept generic Tuple for forward-compat
     assert ret is not None, "filter_article should annotate return type per contract"
@@ -63,9 +65,10 @@ def test_relevance_filter_method_signatures_and_types():
     assert len(params) == 2, "is_nfl_team_mention(self, text: str) expected"
     hints = getattr(is_team, "__annotations__", {})
     assert hints.get("text") == str, "is_nfl_team_mention should annotate text: str per contract"
-    assert hints.get("return") in (bool, type(True)), (
-        "is_nfl_team_mention should return bool per contract"
-    )
+    assert hints.get("return") in (
+        bool,
+        type(True),
+    ), "is_nfl_team_mention should return bool per contract"
 
     is_url = getattr(relevance_filter, "is_nfl_url_pattern")
     sig = inspect.signature(is_url)
@@ -73,7 +76,7 @@ def test_relevance_filter_method_signatures_and_types():
     assert len(params) == 2, "is_nfl_url_pattern(self, url: str) expected"
     hints = getattr(is_url, "__annotations__", {})
     assert hints.get("url") == str, "is_nfl_url_pattern should annotate url: str per contract"
-    assert hints.get("return") in (bool, type(True)), (
-        "is_nfl_url_pattern should return bool per contract"
-    )
-
+    assert hints.get("return") in (
+        bool,
+        type(True),
+    ), "is_nfl_url_pattern should return bool per contract"

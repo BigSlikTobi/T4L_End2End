@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, field_validator
 from urllib.parse import urlparse
+
+from pydantic import BaseModel, field_validator
 
 
 class Article(BaseModel):

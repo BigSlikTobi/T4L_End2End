@@ -18,13 +18,16 @@ class SupabaseClient:
     def __init__(self, url: Optional[str] = None, key: Optional[str] = None) -> None:
         self.url = url or os.getenv("SUPABASE_URL")
         self.key = key or os.getenv("SUPABASE_ANON_KEY")
-    self._client = None
+        self._client = None
 
     @property
     def client(self) -> Any:
         if self._client is None:
             if not (self.url and self.key) or create_client is None:
-                raise RuntimeError("Supabase client not configured. Set SUPABASE_URL and SUPABASE_ANON_KEY, and install supabase-py.")
+                raise RuntimeError(
+                    "Supabase client not configured. Set SUPABASE_URL and "
+                    "SUPABASE_ANON_KEY, and install supabase-py."
+                )
             self._client = create_client(self.url, self.key)
         return self._client
 

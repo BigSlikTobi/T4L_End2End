@@ -4,10 +4,11 @@ Revision ID: 002_feeds
 Revises: 001_articles
 Create Date: 2025-09-07
 """
+
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "002_feeds"

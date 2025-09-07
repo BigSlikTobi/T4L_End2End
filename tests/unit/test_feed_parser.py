@@ -1,5 +1,6 @@
-import pytest
 import importlib
+
+import pytest
 
 
 def _load_rss_parser_module():
@@ -18,4 +19,3 @@ def test_rss_parser_interface_and_output_shape():
     # Expected behavior: returns list of raw article dicts with at least url/title
     # Use a minimal fake feed string once implemented; now, assert callable only.
     assert callable(parse)
-

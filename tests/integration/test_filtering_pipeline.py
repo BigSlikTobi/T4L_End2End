@@ -1,4 +1,4 @@
-from src.services.relevance_filter import RelevanceFilter, FilterDecision
+from src.services.relevance_filter import FilterDecision, RelevanceFilter
 
 
 def test_filtering_pipeline_rule_based():

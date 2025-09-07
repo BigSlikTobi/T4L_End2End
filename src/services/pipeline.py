@@ -1,17 +1,18 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List
 
 import yaml
 
-from .feed_ingester import FeedIngester
-from .relevance_filter import FilterDecision, RelevanceFilter
-from .sitemap_parser import fetch_sitemap, parse_sitemap
-from .logger import log_json
 from ..database.repositories.article_repo import ArticleRepository
 from ..database.repositories.log_repo import ProcessingLogRepository
 from ..database.repositories.watermark_repo import WatermarkRepository
+from .async_processor import map_async, retry
+from .feed_ingester import FeedIngester
+from .logger import log_json
+from .relevance_filter import FilterDecision, RelevanceFilter
+from .sitemap_parser import fetch_sitemap, parse_sitemap
 
 
 class Pipeline:
@@ -38,7 +39,9 @@ class Pipeline:
                 results[k] = results.get(k, 0) + v
         return results
 
-    async def _process_source(self, src: Dict[str, Any], defaults: Dict[str, Any]) -> Dict[str, int]:
+    async def _process_source(
+        self, src: Dict[str, Any], defaults: Dict[str, Any]
+    ) -> Dict[str, int]:
         st = {"total": 0, "kept": 0, "rejected": 0, "escalated": 0}
         name = src.get("name") or src.get("url")
         source_key = name or "unknown"
@@ -51,33 +54,66 @@ class Pipeline:
         items: List[Dict[str, Any]] = []
         if src.get("type") == "rss":
             feed_url = src.get("url")
-            feed = await self.ingester.fetch_feed(feed_url)
-            raw = await self.ingester.extract_articles(feed)
-            for r in raw:
-                items.append(self.ingester.standardize_article(r))
+            max_parallel = int(
+                src.get("max_parallel_fetches", defaults.get("max_parallel_fetches", 5))
+            )
+            timeout = float(src.get("timeout", defaults.get("timeout", 15)))
+
+            async def _fetch_and_parse(url: str) -> List[Dict[str, Any]]:
+                f = await retry(lambda: self.ingester.fetch_feed(url), retries=2, timeout=timeout)
+                return await self.ingester.extract_articles(f)
+
+            # Support single or list of feeds for a source
+            urls = [feed_url] if isinstance(feed_url, str) else (feed_url or [])
+            results = await map_async(urls, _fetch_and_parse, limit=max_parallel)
+            for raw_list in results:
+                for r in raw_list:
+                    items.append(self.ingester.standardize_article(r))
         elif src.get("type") == "sitemap":
-            url = src.get("url") or src.get("url_template")
-            xml = await asyncio.to_thread(fetch_sitemap, url)
-            urls = parse_sitemap(xml)
-            for u in urls:
-                items.append({
-                    "url": u["url"],
-                    "title": u.get("url"),
-                    "publisher": src.get("publisher", ""),
-                    "publication_date": u.get("lastmod"),
-                })
+            url_or_tpl = src.get("url") or src.get("url_template")
+            max_parallel = int(
+                src.get("max_parallel_fetches", defaults.get("max_parallel_fetches", 5))
+            )
+            timeout = float(src.get("timeout", defaults.get("timeout", 15)))
+
+            urls_to_fetch = [url_or_tpl] if isinstance(url_or_tpl, str) else (url_or_tpl or [])
+
+            async def _fetch(url: str) -> List[Dict[str, Any]]:
+                xml = await asyncio.to_thread(fetch_sitemap, url)
+                entries = parse_sitemap(xml)
+                out: List[Dict[str, Any]] = []
+                for u in entries:
+                    out.append(
+                        {
+                            "url": u["url"],
+                            "title": u.get("url"),
+                            "publisher": src.get("publisher", ""),
+                            "publication_date": u.get("lastmod"),
+                        }
+                    )
+                return out
+
+            results = await map_async(
+                urls_to_fetch,
+                lambda u: retry(lambda: _fetch(u), retries=2, timeout=timeout),
+                limit=max_parallel,
+            )
+            for batch in results:
+                items.extend(batch)
         else:
             log_json("WARNING", "Unsupported source type", source=source_key, type=src.get("type"))
             return st
 
         # De-dup by URL and incremental watermarking
         seen: set[str] = set()
+
         def newer_than_watermark(it: Dict[str, Any]) -> bool:
             dt = it.get("publication_date")
             url = it.get("url")
             if last_dt and dt:
                 try:
                     from datetime import datetime
+
                     d = datetime.fromisoformat(str(dt).replace("Z", "+00:00"))
                     return d > last_dt
                 except Exception:
@@ -108,7 +144,9 @@ class Pipeline:
                 st["kept"] += 1
                 # persist
                 obj = self.article_repo.upsert(it)
-                self.log_repo.add("INFO", "kept", article_url=it.get("url"), metadata=str({"score": score}))
+                self.log_repo.add(
+                    "INFO", "kept", article_url=it.get("url"), metadata=str({"score": score})
+                )
                 # watermark update candidate
                 dt = obj.publication_date
                 if dt and (newest_dt is None or dt > newest_dt):

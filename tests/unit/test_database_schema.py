@@ -1,6 +1,6 @@
-import pytest
-import sqlite3
 import os
+
+import pytest
 
 
 def test_sqlite_schema_parity_placeholder():
@@ -12,4 +12,3 @@ def test_sqlite_schema_parity_placeholder():
     # When migrations exist, we will initialize a SQLite DB and verify tables/columns.
     # For now, mark as xfail to keep TDD flow.
     pytest.xfail("Pending database schema and migrations for SQLite parity (T010)")
-
