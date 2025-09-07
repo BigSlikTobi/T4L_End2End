@@ -1,9 +1,8 @@
 import asyncio
 import os
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 from src.services.pipeline import Pipeline
-
 
 SAMPLE_RSS = """
 <rss version="2.0">

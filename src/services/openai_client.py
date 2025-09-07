@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 try:
     # OpenAI >=1.40
@@ -14,13 +14,16 @@ class OpenAIClient:
     """Thin wrapper around OpenAI APIs with a safe offline fallback.
 
     Contract:
-    - classify_title_url(title, url, model=None) -> Dict with keys:
-      { label: str in {"NFL","NON_NFL","AMBIGUOUS"}, confidence: float [0,1], reason: str }
+        - classify_title_url(title, url, model=None) -> Dict with keys label, confidence, reason
     """
 
-    def __init__(self, api_key: Optional[str] = None) -> None:
+    def __init__(self, api_key: Optional[str] = None, enable_cache: bool | None = None) -> None:
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         self._client = None
+        self._cache: Dict[Tuple[str, str], Dict[str, Any]] = {}
+        self._enable_cache = (
+            bool(int(os.getenv("OPENAI_CACHE", "1"))) if enable_cache is None else enable_cache
+        )
         if self.api_key and OpenAI is not None:
             try:
                 self._client = OpenAI(api_key=self.api_key)
@@ -28,15 +31,26 @@ class OpenAIClient:
                 # Fallback to offline if instantiation fails
                 self._client = None
 
-    def classify_title_url(self, title: str, url: str, model: Optional[str] = None) -> Dict[str, Any]:
+    def classify_title_url(
+        self, title: str, url: str, model: Optional[str] = None
+    ) -> Dict[str, Any]:
+        # Cache check
+        cache_key = (title.strip(), url.strip())
+        if self._enable_cache and cache_key in self._cache:
+            return self._cache[cache_key]
+
         # Offline fallback: quick heuristic to avoid hard dependency in dev
         if not self._client:
-            return self._offline_classify(title, url)
+            result = self._offline_classify(title, url)
+            if self._enable_cache:
+                self._cache[cache_key] = result
+            return result
 
         model_name = model or os.getenv("OPENAI_MODEL", "gpt-5-nano")
         prompt = (
             "Classify if the following headline+URL is NFL-related.\n"
-            "Return JSON with keys label in {NFL, NON_NFL, AMBIGUOUS}, confidence [0,1], reason.\n\n"
+            "Return JSON with keys label in {NFL, NON_NFL, AMBIGUOUS}, confidence [0,1], "
+            "reason.\n\n"
             f"Title: {title}\nURL: {url}\n"
         )
         try:
@@ -68,10 +82,16 @@ class OpenAIClient:
             else:
                 label = "AMBIGUOUS"
                 confidence = 0.5
-            return {"label": label, "confidence": confidence, "reason": content[:500]}
+            result = {"label": label, "confidence": confidence, "reason": content[:500]}
+            if self._enable_cache:
+                self._cache[cache_key] = result
+            return result
         except Exception as e:
             # Fallback gracefully
-            return {"label": "AMBIGUOUS", "confidence": 0.5, "reason": f"offline_fallback: {e}"}
+            result = {"label": "AMBIGUOUS", "confidence": 0.5, "reason": f"offline_fallback: {e}"}
+            if self._enable_cache:
+                self._cache[cache_key] = result
+            return result
 
     @staticmethod
     def _offline_classify(title: str, url: str) -> Dict[str, Any]:
@@ -85,15 +105,18 @@ class OpenAIClient:
                 return 1.0 if any(k in t for k in ["nfl", "patriots", "chiefs", "packers"]) else 0.0
 
         text = f"{title} {url}"
-        score = score_text_relevance(text, [
-            "nfl",
-            "super bowl",
-            "patriots",
-            "chiefs",
-            "packers",
-            "eagles",
-            "cowboys",
-        ])
+        score = score_text_relevance(
+            text,
+            [
+                "nfl",
+                "super bowl",
+                "patriots",
+                "chiefs",
+                "packers",
+                "eagles",
+                "cowboys",
+            ],
+        )
         if score >= 0.7:
             return {"label": "NFL", "confidence": min(1.0, score), "reason": "rule-fallback"}
         elif score <= 0.2:

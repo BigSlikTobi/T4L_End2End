@@ -3,22 +3,22 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import String, UniqueConstraint, DateTime
+from sqlalchemy import DateTime, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, Session, mapped_column, sessionmaker
 
-from ..connection import get_sessionmaker
 from ...models.database import Base
+from ..connection import get_sessionmaker
 
 
 class SourceWatermarkORM(Base):
     __tablename__ = "source_watermarks"
-    __table_args__ = (
-        UniqueConstraint("source_key", name="uq_source_watermarks_source_key"),
-    )
+    __table_args__ = (UniqueConstraint("source_key", name="uq_source_watermarks_source_key"),)
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     source_key: Mapped[str] = mapped_column(String(255), nullable=False)
-    last_publication_date: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_publication_date: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     last_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
 
 
@@ -38,7 +38,9 @@ class WatermarkRepository:
                 row.last_publication_date = row.last_publication_date.replace(tzinfo=timezone.utc)
             return row
 
-    def upsert(self, source_key: str, last_publication_date: Optional[datetime], last_url: Optional[str]) -> SourceWatermarkORM:
+    def upsert(
+        self, source_key: str, last_publication_date: Optional[datetime], last_url: Optional[str]
+    ) -> SourceWatermarkORM:
         with self._factory() as session:
             row = (
                 session.query(SourceWatermarkORM)

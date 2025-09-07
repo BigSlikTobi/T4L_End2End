@@ -1,22 +1,18 @@
-"""CLI package placeholder. Commands will be added in later tasks (T027-T030)."""
+"""T4L Core Pipeline CLI entrypoints."""
 
-
-def main() -> None:
-    """Temporary CLI entry point for packaging sanity check."""
-    print("t4l CLI is installed.")
 import click
+
+from .commands.filter import filter_cmd
+from .commands.ingest import ingest
+from .commands.pipeline import pipeline
 
 
 @click.group()
 def cli() -> None:
-    """T4L Core Pipeline CLI"""
+    """T4L Core Pipeline CLI."""
 
 
 def main() -> None:
-    from .commands.ingest import ingest
-    from .commands.filter import filter_cmd
-    from .commands.pipeline import pipeline
-
     cli.add_command(ingest)
     cli.add_command(filter_cmd)
     cli.add_command(pipeline)

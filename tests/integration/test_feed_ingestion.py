@@ -1,8 +1,7 @@
 import asyncio
-from unittest.mock import patch, Mock
+from unittest.mock import Mock, patch
 
 from src.services.feed_ingester import FeedIngester
-
 
 SAMPLE_RSS = """
 <rss version="2.0">

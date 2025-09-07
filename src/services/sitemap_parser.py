@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, List
 
 import requests
 from bs4 import BeautifulSoup
@@ -48,7 +48,9 @@ def parse_sitemap(xml_text: str) -> List[Dict[str, Any]]:
         lastmod = url_tag.find("lastmod")
         if not loc or not loc.text:
             continue
-        out.append({"url": loc.text.strip(), "lastmod": (lastmod.text.strip() if lastmod else None)})
+        out.append(
+            {"url": loc.text.strip(), "lastmod": (lastmod.text.strip() if lastmod else None)}
+        )
     return out
 
 

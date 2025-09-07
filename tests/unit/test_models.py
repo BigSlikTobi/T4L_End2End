@@ -1,5 +1,6 @@
-import pytest
 import importlib
+
+import pytest
 
 
 def _load_models_module():
@@ -32,4 +33,3 @@ def test_article_model_fields_and_validation():
             publisher="X",
             publication_date="2025-09-06T10:00:00Z",
         )
-

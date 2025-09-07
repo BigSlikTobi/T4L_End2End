@@ -4,10 +4,11 @@ Revision ID: 003_processing_log
 Revises: 002_feeds
 Create Date: 2025-09-07
 """
+
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "003_processing_log"

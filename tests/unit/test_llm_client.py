@@ -1,5 +1,6 @@
-import pytest
 import importlib
+
+import pytest
 
 
 def _load_llm_module():
@@ -16,4 +17,3 @@ def test_llm_classifier_interface():
         pytest.xfail("LLMClassifier not found in src.services.llm_classifier (T023)")
 
     assert hasattr(cls, "classify_title_url"), "Missing classify_title_url method"
-

@@ -4,10 +4,11 @@ Revision ID: 004_source_watermarks
 Revises: 003_processing_log
 Create Date: 2025-09-07
 """
+
 from __future__ import annotations
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "004_source_watermarks"

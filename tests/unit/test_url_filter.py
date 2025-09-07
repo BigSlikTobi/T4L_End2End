@@ -1,5 +1,6 @@
-import pytest
 import importlib
+
+import pytest
 
 
 def _load_filter_module():
@@ -26,4 +27,3 @@ def test_is_nfl_url_pattern_examples(url, expected):
 
     # Assume a simple concrete for tests will be provided later; here we only check method exists.
     assert hasattr(cls, "is_nfl_url_pattern"), "Missing is_nfl_url_pattern method"
-

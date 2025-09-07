@@ -141,10 +141,10 @@ git pull
 ## Phase 3.6: Polish
 
 ### Performance & Optimization
-- [ ] T047 Add async processing for concurrent feed fetching (`src/services/async_processor.py`)
-- [ ] T048 Implement connection pooling for database (`src/database/pool.py`)
-- [ ] T049 Add caching for LLM responses (`src/services/cache.py`)
-- [ ] T050 Optimize database queries with proper indexing
+- [x] T047 Add async processing for concurrent feed fetching (`src/services/async_processor.py`, wired in `src/services/pipeline.py`)
+- [x] T048 Implement connection pooling for database (env-driven pool settings in `src/database/connection.py`)
+- [x] T049 Add caching for LLM responses (in-memory cache in `src/services/openai_client.py`)
+- [x] T050 Optimize database queries with proper indexing (Alecmbic notes and optional Postgres indexes in `migrations/versions/005_indexes_and_performance_notes.py`)
 
 ### Monitoring & Observability
 - [ ] T051 Implement health checks (`src/cli/commands/health.py`)

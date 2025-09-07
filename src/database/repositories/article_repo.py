@@ -56,7 +56,9 @@ class ArticleRepository:
             else:
                 obj.title = str(data.get("title") or obj.title)
                 obj.publisher = str(data.get("publisher") or obj.publisher)
-                obj.publication_date = _parse_dt(data.get("publication_date")) or obj.publication_date
+                obj.publication_date = (
+                    _parse_dt(data.get("publication_date")) or obj.publication_date
+                )
                 obj.content_summary = data.get("content_summary", obj.content_summary)
             session.commit()
             session.refresh(obj)

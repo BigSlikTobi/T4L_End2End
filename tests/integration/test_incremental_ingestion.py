@@ -1,8 +1,8 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
-from src.services.sitemap_parser import apply_dynamic_template, current_utc_year_month
 from src.database.repositories.watermark_repo import WatermarkRepository
+from src.services.sitemap_parser import apply_dynamic_template
 
 
 def test_dynamic_sitemap_template_current_month(monkeypatch):

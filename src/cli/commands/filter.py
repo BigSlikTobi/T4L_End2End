@@ -1,7 +1,7 @@
 import click
 
-from ...services.relevance_filter import RelevanceFilter
 from ...services.llm_classifier import LLMClassifier
+from ...services.relevance_filter import RelevanceFilter
 
 
 @click.command(name="filter")
