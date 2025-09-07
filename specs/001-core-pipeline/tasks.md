@@ -127,16 +127,16 @@ git pull
 ## Phase 3.5: Integration Testing
 
 ### Component Integration Tests
-- [ ] T041 Write integration tests for feed ingestion + parsing (`tests/integration/test_feed_ingestion.py`)
-- [ ] T042 Write integration tests for filtering pipeline (`tests/integration/test_filtering_pipeline.py`)
-- [ ] T043 Write integration tests for database operations (`tests/integration/test_database_ops.py`)
- - [ ] T043a Write integration tests for watermark-based incremental ingestion (`tests/integration/test_incremental_ingestion.py`)
- - [ ] T043b Write integration tests for dynamic NFL sitemap URL generation (`tests/integration/test_dynamic_sitemap.py`)
+- [x] T041 Write integration tests for feed ingestion + parsing (`tests/integration/test_feed_ingestion.py`)
+- [x] T042 Write integration tests for filtering pipeline (`tests/integration/test_filtering_pipeline.py`)
+- [x] T043 Write integration tests for database operations (`tests/integration/test_database_ops.py`)
+ - [x] T043a Write integration tests for watermark-based incremental ingestion (`tests/integration/test_incremental_ingestion.py`)
+ - [x] T043b Write integration tests for dynamic NFL sitemap URL generation (`tests/integration/test_dynamic_sitemap.py`)
 
 ### End-to-End Tests
-- [ ] T044 Write E2E test for single feed processing (`tests/integration/test_single_feed_e2e.py`)
-- [ ] T045 Write E2E test for full pipeline with mock data (`tests/integration/test_full_pipeline_e2e.py`)
-- [ ] T046 Write E2E test with real Supabase connection (`tests/integration/test_supabase_integration.py`)
+- [x] T044 Write E2E test for single feed processing (`tests/integration/test_single_feed_e2e.py`)
+- [x] T045 Write E2E test for full pipeline with mock data (`tests/integration/test_full_pipeline_e2e.py`)
+- [x] T046 Write E2E test with real Supabase connection (`tests/integration/test_supabase_integration.py`)
 
 ## Phase 3.6: Polish
 
