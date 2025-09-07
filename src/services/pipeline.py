@@ -8,6 +8,7 @@ import yaml
 from ..database.repositories.article_repo import ArticleRepository
 from ..database.repositories.log_repo import ProcessingLogRepository
 from ..database.repositories.watermark_repo import WatermarkRepository
+from .metrics import Metrics
 from .async_processor import map_async, retry
 from .feed_ingester import FeedIngester
 from .logger import log_json
@@ -34,7 +35,8 @@ class Pipeline:
         for src in sources:
             if not src.get("enabled", True):
                 continue
-            st = await self._process_source(src, defaults)
+            with Metrics.time("pipeline.process_source"):
+                st = await self._process_source(src, defaults)
             for k, v in st.items():
                 results[k] = results.get(k, 0) + v
         return results
@@ -131,9 +133,10 @@ class Pipeline:
             seen.add(url)
             if not newer_than_watermark(it):
                 continue
-            filtered_items.append(it)
+        filtered_items.append(it)
 
         st["total"] = len(filtered_items)
+        Metrics.counter("pipeline.items_total").inc(st["total"])
 
         # Filtering and persistence
         newest_dt = last_dt
@@ -152,8 +155,10 @@ class Pipeline:
                 if dt and (newest_dt is None or dt > newest_dt):
                     newest_dt = dt
                     newest_url = obj.url
+                Metrics.counter("pipeline.items_kept").inc(1)
             elif decision is FilterDecision.REJECT:
                 st["rejected"] += 1
+                Metrics.counter("pipeline.items_rejected").inc(1)
             else:
                 st["escalated"] += 1
 
