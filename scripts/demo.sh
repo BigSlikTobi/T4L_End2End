@@ -29,4 +29,5 @@ YAML
 # 3) Run pipeline
 python -m src.cli pipeline --config "$TMP_CFG"
 
-echo "\nDemo complete."
+echo
+echo "Demo complete."
