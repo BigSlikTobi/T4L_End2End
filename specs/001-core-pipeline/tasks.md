@@ -152,10 +152,10 @@ git pull
 - [x] T053 Implement log aggregation to database (`src/services/log_aggregator.py`)
 
 ### Documentation & Deployment
-- [ ] T054 Create API documentation (`docs/api.md`)
-- [ ] T055 Create deployment configuration (Dockerfile, docker-compose.yml)
-- [ ] T056 Create CI/CD pipeline (GitHub Actions)
-- [ ] T057 Write production deployment guide (`docs/deployment.md`)
+- [x] T054 Create API documentation (`docs/api.md`)
+- [x] T055 Create deployment configuration (Dockerfile, docker-compose.yml)
+- [x] T056 Create CI/CD pipeline (GitHub Actions)
+- [x] T057 Write production deployment guide (`docs/deployment.md`)
 
 ### Final Validation
 - [ ] T058 Run full test suite with >80% coverage

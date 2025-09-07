@@ -8,10 +8,10 @@ import yaml
 from ..database.repositories.article_repo import ArticleRepository
 from ..database.repositories.log_repo import ProcessingLogRepository
 from ..database.repositories.watermark_repo import WatermarkRepository
-from .metrics import Metrics
 from .async_processor import map_async, retry
 from .feed_ingester import FeedIngester
 from .logger import log_json
+from .metrics import Metrics
 from .relevance_filter import FilterDecision, RelevanceFilter
 from .sitemap_parser import fetch_sitemap, parse_sitemap
 
