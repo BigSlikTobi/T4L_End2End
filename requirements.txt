@@ -8,6 +8,8 @@ lxml>=5.2
 python-dotenv>=1.0
 loguru>=0.7
 click>=8.1
+openai>=1.40
+supabase>=2.6
 
 # Dev
 pytest>=8.2

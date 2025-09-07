@@ -8,6 +8,11 @@ from sqlalchemy.orm import Session, sessionmaker
 
 
 def get_database_url() -> str:
+    """Resolve database URL from env; defaults to local SQLite.
+
+    Supports switching to Supabase/Postgres via DATABASE_URL, e.g.,
+    DATABASE_URL=postgresql+psycopg://user:pass@host:5432/db
+    """
     return os.getenv("DATABASE_URL", "sqlite:///./t4l.db")
 
 
