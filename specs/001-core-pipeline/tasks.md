@@ -78,8 +78,8 @@
 ## Phase 3.3: Core Implementation
 
 ### Data Models
-- [ ] T016 Implement Pydantic models (`src/models/article.py`, `src/models/feed.py`)
-- [ ] T017 Implement database models (`src/models/database.py`)
+- [x] T016 Implement Pydantic models (`src/models/article.py`, `src/models/feed.py`)
+- [x] T017 Implement database models (`src/models/database.py`)
 
 ### Services - Feed Ingestion
 - [ ] T018 Implement FeedIngester concrete class (`src/services/feed_ingester.py`)
