@@ -114,9 +114,9 @@ git pull
 - [x] T034 Implement database initialization script (`src/database/init_db.py`)
 
 ### External Service Integration
-- [ ] T035 Integrate OpenAI API client (`src/services/openai_client.py`)
-- [ ] T036 Integrate Supabase client (`src/database/supabase_client.py`)
-- [ ] T037 Implement environment-based database switching (SQLite ↔ Supabase)
+- [x] T035 Integrate OpenAI API client (`src/services/openai_client.py`)
+- [x] T036 Integrate Supabase client (`src/database/supabase_client.py`)
+- [x] T037 Implement environment-based database switching (SQLite ↔ Supabase)
 
 ### Full Pipeline Integration
 - [ ] T038 Implement end-to-end pipeline orchestrator (`src/services/pipeline.py`)

@@ -35,7 +35,7 @@ target_metadata = Base.metadata
 
 
 def run_migrations_offline() -> None:
-    url = config.get_main_option("sqlalchemy.url")
+    url = os.getenv("DATABASE_URL") or config.get_main_option("sqlalchemy.url")
     context.configure(url=url, target_metadata=target_metadata, literal_binds=True)
 
     with context.begin_transaction():
@@ -43,8 +43,13 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
+    section = config.get_section(config.config_ini_section) or {}
+    # Override URL from env if provided
+    env_url = os.getenv("DATABASE_URL")
+    if env_url:
+        section["sqlalchemy.url"] = env_url
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section) or {},
+        section,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
