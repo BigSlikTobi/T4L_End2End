@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  pipeline:
+    build: .
+    image: t4l-end2end:latest
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+    command: ["python", "-m", "src.cli", "pipeline", "--config", "config/feeds.yaml"]

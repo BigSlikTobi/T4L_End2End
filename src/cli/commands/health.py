@@ -50,7 +50,9 @@ def health_cmd() -> None:
     except Exception:  # pragma: no cover - optional dependency
         supabase_import = False
     status["supabase"] = {
-        "configured": bool(os.getenv("SUPABASE_URL")) and bool(os.getenv("SUPABASE_ANON_KEY")) and supabase_import,
+        "configured": bool(os.getenv("SUPABASE_URL"))
+        and bool(os.getenv("SUPABASE_ANON_KEY"))
+        and supabase_import,
         "import_ok": supabase_import,
     }
 

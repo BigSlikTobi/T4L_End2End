@@ -3,9 +3,9 @@
 import click
 
 from .commands.filter import filter_cmd
+from .commands.health import health_cmd
 from .commands.ingest import ingest
 from .commands.pipeline import pipeline
-from .commands.health import health_cmd
 
 
 @click.group()
