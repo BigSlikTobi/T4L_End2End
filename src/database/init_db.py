@@ -3,9 +3,9 @@ from __future__ import annotations
 import os
 
 from alembic import command
+from alembic.config import Config
 from alembic.util.exc import CommandError
 from sqlalchemy.exc import OperationalError
-from alembic.config import Config
 
 
 def upgrade_to_head(alembic_ini_path: str | None = None) -> None:
