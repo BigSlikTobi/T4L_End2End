@@ -1,15 +1,32 @@
-"""Simplified Supabase integration using the Python client."""
+"""Simplified Supabase integration using the Python client.
+
+This module treats the Supabase client as an optional dependency. If the
+`supabase` package isn't installed, all functions will degrade gracefully
+and behave as no-ops that return False/None instead of raising ImportError.
+"""
 
 from __future__ import annotations
 
 import os
 from typing import Any, Dict, List, Optional
 
-from supabase import Client, create_client
+try:
+    # Optional dependency
+    from supabase import Client, create_client  # type: ignore
+
+    SUPABASE_AVAILABLE = True
+except Exception:  # ImportError or other runtime import issues
+    SUPABASE_AVAILABLE = False
+    Client = Any  # type: ignore
+
+    def create_client(*args: Any, **kwargs: Any) -> Any:  # type: ignore
+        return None
 
 
-def get_supabase_client() -> Optional[Client]:
+def get_supabase_client() -> Optional[Any]:
     """Get Supabase client if credentials are available."""
+    if not SUPABASE_AVAILABLE:
+        return None
     url = os.getenv("SUPABASE_URL")
     key = os.getenv("SUPABASE_ANON_KEY")
 
@@ -22,7 +39,7 @@ def get_supabase_client() -> Optional[Client]:
 class SimpleSupabaseRepo:
     """Simple repository using Supabase client directly."""
 
-    def __init__(self, client: Optional[Client] = None):
+    def __init__(self, client: Optional[Any] = None):
         self.client = client or get_supabase_client()
 
     def save_articles(self, articles: List[Dict[str, Any]]) -> bool:

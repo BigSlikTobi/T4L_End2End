@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
-from src.services.simple_pipeline import SimplifiedPipeline
+from services.simple_pipeline import SimplifiedPipeline
 
 
 @pytest.mark.asyncio
@@ -17,7 +17,7 @@ async def test_run_source_url_template_expansion_local_rss():
         "type": "rss",
     }
 
-    with patch("src.services.feed_ingester.FeedIngester") as mock_ingester:
+    with patch("services.simple_pipeline.FeedIngester") as mock_ingester:
         mock_instance = mock_ingester.return_value
         mock_instance.fetch_feed = AsyncMock(return_value={"status": 200, "content": "<rss></rss>"})
         mock_instance.extract_articles = AsyncMock(return_value=[])
@@ -62,9 +62,9 @@ async def test_run_with_local_sitemap_nfl_flow():
     ]
 
     with (
-        patch("src.services.sitemap_parser.fetch_sitemap", return_value="<xml></xml>"),
-        patch("src.services.sitemap_parser.parse_sitemap", return_value=sitemap_urls),
-        patch("src.services.nfl_extractor.extract_nfl_articles", return_value=nfl_articles),
+        patch("services.sitemap_parser.fetch_sitemap", return_value="<xml></xml>"),
+        patch("services.sitemap_parser.parse_sitemap", return_value=sitemap_urls),
+        patch("services.nfl_extractor.extract_nfl_articles", return_value=nfl_articles),
     ):
 
         result = await pipeline.run_source(source_config)
@@ -115,9 +115,9 @@ async def test_run_with_supabase_sitemap_nfl_flow():
     ]
 
     with (
-        patch("src.services.sitemap_parser.fetch_sitemap", return_value="<xml></xml>"),
-        patch("src.services.sitemap_parser.parse_sitemap", return_value=sitemap_urls),
-        patch("src.services.nfl_extractor.extract_nfl_articles", return_value=nfl_articles),
+        patch("services.sitemap_parser.fetch_sitemap", return_value="<xml></xml>"),
+        patch("services.sitemap_parser.parse_sitemap", return_value=sitemap_urls),
+        patch("services.nfl_extractor.extract_nfl_articles", return_value=nfl_articles),
     ):
 
         result = await pipeline.run_source(source_config)

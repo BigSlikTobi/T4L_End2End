@@ -11,7 +11,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
 # Import ORM base for optional auto-creation in lightweight SQLite setups (tests)
-from ..models.database import Base
+from models.database import Base
 
 
 def _valid_db_url(url: str | None) -> bool:

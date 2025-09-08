@@ -5,8 +5,8 @@ from typing import Any, Dict, Optional
 
 from sqlalchemy.orm import Session, sessionmaker
 
-from ...models.database import ArticleORM
-from ..connection import get_sessionmaker
+from database.connection import get_sessionmaker
+from models.database import ArticleORM
 
 
 def _parse_dt(value: Any) -> Optional[datetime]:

@@ -1,27 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import DateTime, Integer, String, Text
-from sqlalchemy.orm import Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
-from ...models.database import Base
-from ..connection import get_sessionmaker
-
-
-class ProcessingLogORM(Base):
-    __tablename__ = "processing_log"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
-    )
-    level: Mapped[str] = mapped_column(String(20), nullable=False)
-    message: Mapped[str] = mapped_column(Text, nullable=False)
-    article_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
-    # 'metadata' is reserved on Declarative models; use attribute 'meta' and column name 'metadata'
-    meta: Mapped[Optional[str]] = mapped_column("metadata", Text, nullable=True)
+from database.connection import get_sessionmaker
+from models.database import ProcessingLogORM
 
 
 class ProcessingLogRepository:
@@ -45,4 +29,4 @@ class ProcessingLogRepository:
             return row
 
 
-__all__ = ["ProcessingLogRepository", "ProcessingLogORM", "Base"]
+__all__ = ["ProcessingLogRepository"]

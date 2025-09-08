@@ -2,8 +2,8 @@ import asyncio
 
 import click
 
-from ...services.feed_ingester import FeedIngester
-from ...services.sitemap_parser import fetch_sitemap, parse_sitemap
+from services.feed_ingester import FeedIngester
+from services.sitemap_parser import fetch_sitemap, parse_sitemap
 
 
 @click.command()

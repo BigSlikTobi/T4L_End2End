@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 import click
 from sqlalchemy import text
 
-from ...database.connection import get_engine
+from database.connection import get_engine
 
 
 @click.command(name="health")
@@ -32,7 +32,7 @@ def health_cmd() -> None:
 
     # OpenAI configuration check (non-fatal)
     try:
-        from ...services.openai_client import OpenAIClient  # noqa: F401
+        from services.openai_client import OpenAIClient  # noqa: F401
 
         openai_import = True
     except Exception:  # pragma: no cover - optional dependency
@@ -44,7 +44,7 @@ def health_cmd() -> None:
 
     # Supabase configuration check (non-fatal)
     try:
-        from ...database.supabase_client import SupabaseClient  # type: ignore
+        from database.supabase_client import SupabaseClient  # type: ignore
 
         sc = SupabaseClient()
         status["supabase"] = sc.status()

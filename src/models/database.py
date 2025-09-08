@@ -38,4 +38,30 @@ class FeedORM(Base):
     active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
 
-__all__ = ["Base", "ArticleORM", "FeedORM"]
+class ProcessingLogORM(Base):
+    __tablename__ = "processing_log"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+    )
+    level: Mapped[str] = mapped_column(String(20), nullable=False)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    article_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+    # 'metadata' is reserved on Declarative models; use attribute 'meta' and column name 'metadata'
+    meta: Mapped[Optional[str]] = mapped_column("metadata", Text, nullable=True)
+
+
+class SourceWatermarkORM(Base):
+    __tablename__ = "source_watermarks"
+    __table_args__ = (UniqueConstraint("source_key", name="uq_source_watermarks_source_key"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    source_key: Mapped[str] = mapped_column(String(255), nullable=False)
+    last_publication_date: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    last_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+
+
+__all__ = ["Base", "ArticleORM", "FeedORM", "ProcessingLogORM", "SourceWatermarkORM"]

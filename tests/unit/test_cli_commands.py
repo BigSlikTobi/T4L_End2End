@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from click.testing import CliRunner
 
-from src.cli import cli
-from src.cli.commands.filter import filter_cmd
-from src.cli.commands.ingest import ingest
-from src.cli.commands.pipeline import pipeline
+from cli import cli
+from cli.commands.filter import filter_cmd
+from cli.commands.ingest import ingest
+from cli.commands.pipeline import pipeline
 
 
 def test_filter_command_runs_with_minimal_args():
