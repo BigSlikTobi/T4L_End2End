@@ -1,0 +1,47 @@
+openapi: 3.0.3
+info:
+  title: T4L NFL Event KG Contracts
+  version: 0.1.0
+  description: Contract surface for event browsing and evidence viewing
+paths:
+  /events:
+    get:
+      summary: List events
+      parameters:
+        - in: query
+          name: team_id
+          schema: { type: string }
+        - in: query
+          name: player_id
+          schema: { type: string }
+        - in: query
+          name: type
+          schema: { type: string }
+        - in: query
+          name: min_confidence
+          schema: { type: integer, minimum: 0, maximum: 100 }
+      responses:
+        '200':
+          description: OK
+  /events/{event_id}:
+    get:
+      summary: Get event details with claims and citations
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
+  /events/{event_id}/summary:
+    get:
+      summary: Get human-readable event summary with citations
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: OK
