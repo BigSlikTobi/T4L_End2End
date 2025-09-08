@@ -41,7 +41,7 @@ class TestSimpleSupabaseRepo:
         mock_client = Mock()
         mock_table = Mock()
         mock_client.table.return_value = mock_table
-        mock_table.insert.return_value = mock_table
+        mock_table.upsert.return_value = mock_table
         mock_table.execute.return_value = Mock(data=[{"id": 1}, {"id": 2}])
         mock_create_client.return_value = mock_client
 
@@ -60,7 +60,11 @@ class TestSimpleSupabaseRepo:
 
             assert result is True  # Returns bool, not count
             mock_client.table.assert_called_with("articles")
-            mock_table.insert.assert_called_once_with(articles)
+            # upsert called with on_conflict url and ignore_duplicates True (if supported)
+            called_args, called_kwargs = mock_table.upsert.call_args
+            assert called_args[0] == articles
+            assert called_kwargs.get("on_conflict") == "url"
+            # ignore_duplicates may or may not be passed depending on client support
 
     @patch("src.database.supabase_simple.create_client")
     def test_save_articles_empty_list(self, mock_create_client):
@@ -82,8 +86,14 @@ class TestSimpleSupabaseRepo:
         mock_client = Mock()
         mock_table = Mock()
         mock_client.table.return_value = mock_table
-        mock_table.insert.return_value = mock_table
-        mock_table.execute.side_effect = Exception("Database error")
+
+        # Make upsert raise an exception to trigger failure path
+        def raise_err(*args, **kwargs):
+            raise Exception("Database error")
+
+        mock_table.upsert.side_effect = raise_err
+        # Also make per-row insert fail to ensure method returns False
+        mock_table.insert.side_effect = raise_err
         mock_create_client.return_value = mock_client
 
         with patch.dict(
