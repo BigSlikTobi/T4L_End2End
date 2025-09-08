@@ -4,6 +4,7 @@ from ...services.llm_classifier import LLMClassifier
 from ...services.relevance_filter import RelevanceFilter
 
 
+# CLI command to filter an article based on title and URL
 @click.command(name="filter")
 @click.option("--title", required=True)
 @click.option("--url", required=True)
