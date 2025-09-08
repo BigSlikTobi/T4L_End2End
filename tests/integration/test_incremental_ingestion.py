@@ -31,3 +31,15 @@ def test_watermark_increments(tmp_path, monkeypatch):
     repo.upsert(key, t2, "https://example.com/b")
     row2 = repo.get(key)
     assert row2 and row2.last_publication_date == t2 and row2.last_url == "https://example.com/b"
+
+
+def test_dedup_clustering_within_5_days(tmp_path, monkeypatch):
+    """
+    T008: Two highly similar articles within 5 days should cluster into the same event
+    and increase confidence with corroboration.
+
+    Pending implementation of event clustering and confidence computation, mark xfail.
+    """
+    import pytest
+
+    pytest.xfail("Pending clustering and confidence (T013–T014)")
