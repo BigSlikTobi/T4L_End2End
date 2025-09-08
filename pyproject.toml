@@ -32,6 +32,13 @@ dev = [
   "types-requests>=2.32",
 ]
 
+# Optional NFL reference data; prefer Python 3.12 for these due to pandas wheels
+nfl = [
+  "nfl-data-py==0.3.3",
+  "pandas==2.2.2; python_version < '3.13'",
+  "pyarrow>=10",
+]
+
 [project.scripts]
 t4l = "cli:main"
 

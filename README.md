@@ -54,6 +54,9 @@ SUPABASE_ANON_KEY=
 LOG_LEVEL=INFO
 ```
 
+Optional data sources:
+- nfl_data_py (used for NFL reference data loaders): install optional extra `nfl` (recommended on Python 3.12).
+
 ### 3) Run tests
 ```
 pytest -q
@@ -172,6 +175,19 @@ SUPABASE_ANON_KEY=...
 python -m src.cli health
 ```
 Look for `"database": { "ok": true }` and `"supabase": { "configured": true }`.
+
+## NFL Reference Data (optional)
+
+To enable reference data loaders, install the optional extras (prefer Python 3.12 due to pandas wheels):
+
+```
+pip install -e .[nfl]
+```
+
+Quick check (non-fatal):
+```
+make verify-nfl
+```
 
 How backend selection works:
 - If `DATABASE_URL` starts with `sqlite`, the app uses SQLite and auto-creates tables.

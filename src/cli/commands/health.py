@@ -44,17 +44,31 @@ def health_cmd() -> None:
 
     # Supabase configuration check (non-fatal)
     try:
-        from ...database.supabase_client import create_client  # type: ignore  # noqa: F401
+        from ...database.supabase_client import SupabaseClient  # type: ignore
 
-        supabase_import = True
+        sc = SupabaseClient()
+        status["supabase"] = sc.status()
     except Exception:  # pragma: no cover - optional dependency
-        supabase_import = False
-    status["supabase"] = {
-        "configured": bool(os.getenv("SUPABASE_URL"))
-        and bool(os.getenv("SUPABASE_ANON_KEY"))
-        and supabase_import,
-        "import_ok": supabase_import,
-    }
+        status["supabase"] = {
+            "configured": False,
+            "import_ok": False,
+            "has_url": bool(os.getenv("SUPABASE_URL")),
+            "has_key": bool(os.getenv("SUPABASE_ANON_KEY")),
+        }
+
+    # nfl_data_py presence (non-fatal)
+    try:
+        import nfl_data_py as _nfl  # type: ignore  # noqa: F401
+
+        try:
+            import importlib.metadata as _md  # py3.8+
+
+            _ver = _md.version("nfl-data-py")
+        except Exception:
+            _ver = None
+        status["nfl_data_py"] = {"import_ok": True, "version": _ver}
+    except Exception:  # pragma: no cover - optional dependency
+        status["nfl_data_py"] = {"import_ok": False}
 
     click.echo(json.dumps(status))
 
