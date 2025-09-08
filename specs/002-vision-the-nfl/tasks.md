@@ -7,9 +7,9 @@
 - This file is generated per template and tailored to the feature. Execute tasks top-to-bottom, honoring dependencies and [P] for safe parallelism.
 
 ## Phase 3.1: Setup
-- [ ] T001 Ensure Supabase connection config is present and working (env, URL, key) in `src/database/supabase_client.py`
-- [ ] T002 [P] Add dependency lock/verify for `nfl_data_py` and ensure availability in runtime env (document in README if needed)
-- [ ] T003 [P] Add migration stubs for reference tables (teams, players, player_team_history) and KG tables (events, event_entities, claims, claim_sources, event_articles, sources) under `migrations/versions/`
+- [x] T001 Ensure Supabase connection config is present and working (env, URL, key) in `src/database/supabase_client.py`
+- [x] T002 [P] Add dependency lock/verify for `nfl_data_py` and ensure availability in runtime env (document in README if needed)
+- [x] T003 [P] Add migration stubs for reference tables (teams, players, player_team_history) and KG tables (events, event_entities, claims, claim_sources, event_articles, sources) under `migrations/versions/`
 
 ## Phase 3.2: Tests First (TDD) ⚠️ MUST COMPLETE BEFORE 3.3
 - [ ] T004 [P] Contract test GET /events in `tests/contract/test_events_list.py` (based on `contracts/openapi.yaml`)

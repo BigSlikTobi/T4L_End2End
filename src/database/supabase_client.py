@@ -16,9 +16,36 @@ class SupabaseClient:
     """
 
     def __init__(self, url: Optional[str] = None, key: Optional[str] = None) -> None:
+        # Resolve configuration from explicit args or environment
         self.url = url or os.getenv("SUPABASE_URL")
         self.key = key or os.getenv("SUPABASE_ANON_KEY")
-        self._client = None
+        self._client: Any | None = None
+
+    @staticmethod
+    def config_from_env() -> Dict[str, Optional[str]]:
+        """Return Supabase URL and Key from environment variables.
+
+        Keys:
+          - url: SUPABASE_URL
+          - key: SUPABASE_ANON_KEY
+        """
+        return {
+            "url": os.getenv("SUPABASE_URL"),
+            "key": os.getenv("SUPABASE_ANON_KEY"),
+        }
+
+    def is_configured(self) -> bool:
+        """Whether both URL and key are available and client lib importable."""
+        return bool(self.url and self.key and create_client is not None)
+
+    def status(self) -> Dict[str, Any]:
+        """Configuration status for health checks and diagnostics."""
+        return {
+            "configured": self.is_configured(),
+            "import_ok": create_client is not None,
+            "has_url": bool(self.url),
+            "has_key": bool(self.key),
+        }
 
     @property
     def client(self) -> Any:
