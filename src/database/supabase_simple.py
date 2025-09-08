@@ -31,9 +31,36 @@ class SimpleSupabaseRepo:
             return False
 
         try:
-            # Batch insert articles
-            result = self.client.table("articles").insert(articles).execute()
-            return len(result.data) > 0
+            # No work to do
+            if not articles:
+                return False
+
+            table = self.client.table("articles")
+
+            # Prefer upsert with conflict on URL, ignoring duplicates so the batch doesn't fail
+            try:
+                # Some versions of supabase-py/postgrest support ignore_duplicates
+                table.upsert(articles, on_conflict="url", ignore_duplicates=True).execute()
+                # Treat as success even if all were duplicates (result.data may be empty)
+                return True
+            except TypeError:
+                # Fallback for older client signature without ignore_duplicates
+                table.upsert(articles, on_conflict="url").execute()
+                return True
+            except Exception:
+                # As a last resort, fall back to per-row insert and ignore duplicates
+                inserted_any = False
+                for row in articles:
+                    try:
+                        table.insert(row).execute()
+                        inserted_any = True
+                    except Exception as ex:
+                        # Ignore unique violations on url; re-raise only for other errors
+                        msg = str(ex)
+                        if "duplicate key value" in msg or "23505" in msg:
+                            continue
+                        raise
+                return inserted_any or True  # If all were duplicates, still a logical success
         except Exception as e:
             print(f"Failed to save articles to Supabase: {e}")
             return False
