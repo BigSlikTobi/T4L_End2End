@@ -47,7 +47,7 @@ class TestSimplifiedPipeline:
         }
 
         # Mock the ingester and its methods
-        with patch("src.services.feed_ingester.FeedIngester") as mock_ingester:
+        with patch("src.services.simple_pipeline.FeedIngester") as mock_ingester:
             mock_instance = mock_ingester.return_value
             mock_instance.fetch_feed = AsyncMock(
                 return_value={"status": 200, "content": "<rss></rss>"}

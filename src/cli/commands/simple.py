@@ -5,13 +5,14 @@ import os
 
 import click
 
-from ...services.simple_pipeline import run_simplified_pipeline
+from services.simple_pipeline import run_simplified_pipeline
 
 
-@click.command()
+@click.command(name="simple", help="Run a simplified pipeline that can optionally use Supabase.")
 @click.option("--config", default="config/feeds.yaml", help="Path to feeds configuration file")
+@click.option("--allowlist", default=None, help="Optional path to allowlist.yaml (overrides env)")
 @click.option("--supabase", is_flag=True, help="Use Supabase instead of local SQLite")
-def simple_pipeline(config: str, supabase: bool):
+def simple_pipeline(config: str, allowlist: str | None, supabase: bool):
     """Run a simplified pipeline that can optionally use Supabase directly."""
 
     if supabase:
@@ -28,6 +29,9 @@ def simple_pipeline(config: str, supabase: bool):
         click.echo("🚀 Running pipeline with local SQLite...")
 
     async def run():
+        # Allowlist override via env variable for extractor
+        if allowlist:
+            os.environ["T4L_ALLOWLIST_PATH"] = allowlist
         results = await run_simplified_pipeline(config, use_supabase=supabase)
 
         total_articles = sum(r.get("articles_count", 0) for r in results)

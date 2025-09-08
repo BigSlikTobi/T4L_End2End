@@ -6,15 +6,15 @@ from typing import Any, Dict, List
 
 import yaml
 
-from ..database.repositories.article_repo import ArticleRepository
-from ..database.repositories.log_repo import ProcessingLogRepository
-from ..database.repositories.watermark_repo import WatermarkRepository
-from .async_processor import map_async, retry
-from .feed_ingester import FeedIngester
-from .logger import log_json
-from .metrics import Metrics
-from .relevance_filter import FilterDecision, RelevanceFilter
-from .sitemap_parser import fetch_sitemap, parse_sitemap
+from database.repositories.article_repo import ArticleRepository
+from database.repositories.log_repo import ProcessingLogRepository
+from database.repositories.watermark_repo import WatermarkRepository
+from services.async_processor import map_async, retry
+from services.feed_ingester import FeedIngester
+from services.logger import log_json
+from services.metrics import Metrics
+from services.relevance_filter import FilterDecision, RelevanceFilter
+from services.sitemap_parser import fetch_sitemap, parse_sitemap
 
 
 class Pipeline:

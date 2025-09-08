@@ -1,0 +1,15 @@
+# Allowlisted fact patterns for claim extraction
+# Each item is a regex (case-insensitive)
+
+# Tips
+# Patterns are case-insensitive.
+# Prefer single quotes to avoid double-escaping backslashes.
+# Use word boundaries (\b) to avoid over-matching.
+
+patterns:
+  - "\\b(signs?|re-signs?|agrees? to)\\b"
+  - "\\b(traded?|trade[s]? for|acquires?|acquired)\\b"
+  - "\\b(placed? on (ir|injured reserve)|suffers?|tear|fracture|sprain|strain|injury)\\b"
+  - "\\b(waived|released|cut)\\b"
+  - "\\b(activated|designated to return)\\b"
+  - "\\b(suspended|suspension)\\b"

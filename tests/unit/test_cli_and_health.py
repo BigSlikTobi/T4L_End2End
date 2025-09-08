@@ -4,8 +4,8 @@ import json
 
 from click.testing import CliRunner
 
-import src.cli as cli_mod
-from src.cli.commands.health import health_cmd
+import cli as cli_mod
+from cli.commands.health import health_cmd
 
 
 def test_cli_import_and_help():

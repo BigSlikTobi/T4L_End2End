@@ -4,9 +4,20 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from ..database.supabase_simple import SimpleSupabaseRepo
-from ..services.feed_ingester import FeedIngester
-from ..services.pipeline import Pipeline
+from database.connection import get_sessionmaker
+from database.supabase_simple import SimpleSupabaseRepo
+from models import (
+    ClaimORM,
+    ClaimSourceORM,
+    EventArticleORM,
+    EventORM,
+    SourceORM,
+)
+from services.claim_extractor import extract_allowlisted_claims
+from services.confidence import compute_event_confidence
+from services.feed_ingester import FeedIngester
+from services.pipeline import Pipeline
+from services.signature import event_signature
 
 
 class SimplifiedPipeline:
@@ -69,8 +80,8 @@ class SimplifiedPipeline:
 
             if feed_type == "sitemap":
                 # Handle sitemap parsing
-                from ..services.nfl_extractor import extract_nfl_articles
-                from ..services.sitemap_parser import fetch_sitemap, parse_sitemap
+                from services.nfl_extractor import extract_nfl_articles
+                from services.sitemap_parser import fetch_sitemap, parse_sitemap
 
                 xml_text = fetch_sitemap(source_config["url"])
                 sitemap_urls = parse_sitemap(xml_text)
@@ -190,7 +201,7 @@ class SimplifiedPipeline:
 
     async def _run_with_local(self, source_config: Dict[str, Any]) -> Dict[str, Any]:
         """Run with local SQLite (using existing services directly)."""
-        from ..services.feed_ingester import FeedIngester
+        # Use absolute imports when needed inside function scope
 
         try:
             # Use FeedIngester directly instead of full pipeline
@@ -199,8 +210,8 @@ class SimplifiedPipeline:
 
             if feed_type == "sitemap":
                 # Handle sitemap parsing
-                from ..services.nfl_extractor import extract_nfl_articles
-                from ..services.sitemap_parser import fetch_sitemap, parse_sitemap
+                from services.nfl_extractor import extract_nfl_articles
+                from services.sitemap_parser import fetch_sitemap, parse_sitemap
 
                 xml_text = fetch_sitemap(source_config["url"])
                 sitemap_urls = parse_sitemap(xml_text)
@@ -270,6 +281,117 @@ class SimplifiedPipeline:
                 }
 
             # For local mode, we'll just return the count (could save to SQLite here if needed)
+            # Persist minimal event records via signature clustering
+            sm = get_sessionmaker()
+            with sm() as session:
+                created_or_linked = 0
+                import hashlib
+                from datetime import datetime, timezone
+
+                for a in articles:
+                    title = a.get("title") or ""
+                    pub = a.get("publication_date")
+                    pub_dt = None
+                    try:
+                        if isinstance(pub, str):
+                            from dateutil import parser as dtp  # type: ignore
+
+                            pub_dt = dtp.parse(pub)
+                        elif pub:
+                            pub_dt = pub
+                    except Exception:
+                        pub_dt = None
+
+                    sig = event_signature(title, pub_dt)
+                    ev = session.query(EventORM).filter_by(signature=sig).one_or_none()
+                    now = datetime.now(timezone.utc)
+                    if not ev:
+                        ev = EventORM(
+                            signature=sig,
+                            event_date=pub_dt,
+                            event_type=None,
+                            title=title,
+                            summary=a.get("content_summary"),
+                            confidence=None,
+                            created_at=now,
+                            updated_at=now,
+                        )
+                        session.add(ev)
+                        session.flush()
+                    else:
+                        ev.updated_at = now
+
+                    # Link article using a stable pseudo ID derived from URL to avoid duplicates
+                    url = a.get("url") or ""
+                    if url:
+                        # Stable 31-bit id; negative to avoid clashing with real positive IDs
+                        pseudo_id = -(
+                            int(hashlib.sha1(url.encode("utf-8")).hexdigest(), 16) % 2147483647
+                        )
+                    else:
+                        pseudo_id = 0
+
+                    exists = (
+                        session.query(EventArticleORM)
+                        .filter_by(event_id=ev.id, article_id=pseudo_id)
+                        .one_or_none()
+                    )
+                    if not exists:
+                        session.add(
+                            EventArticleORM(
+                                event_id=ev.id, article_id=pseudo_id, relation="primary"
+                            )
+                        )
+                        created_or_linked += 1
+                    # Extract allowlisted claims and persist with provenance
+                    content_summary = a.get("content_summary") or ""
+                    claims = extract_allowlisted_claims(title, content_summary)
+                    if claims:
+                        # Ensure a Source row exists for the publisher/url combo (simplified)
+                        src_name = a.get("publisher") or "unknown"
+                        src_url = a.get("url") or None
+                        source = (
+                            session.query(SourceORM)
+                            .filter_by(name=src_name, url=src_url)
+                            .one_or_none()
+                        )
+                        if not source:
+                            source = SourceORM(name=src_name, publisher=src_name, url=src_url)
+                            session.add(source)
+                            session.flush()
+                        for c in claims:
+                            existing_claim = (
+                                session.query(ClaimORM)
+                                .filter_by(event_id=ev.id, claim_text=c.text)
+                                .one_or_none()
+                            )
+                            if existing_claim:
+                                claim_id = existing_claim.id
+                            else:
+                                claim_row = ClaimORM(
+                                    event_id=ev.id, claim_text=c.text, status=c.status
+                                )
+                                session.add(claim_row)
+                                session.flush()
+                                claim_id = claim_row.id
+                            session.add(
+                                ClaimSourceORM(
+                                    claim_id=claim_id,
+                                    source_id=source.id,
+                                    url=src_url,
+                                    citation=c.citation,
+                                )
+                            )
+
+                # Compute naive confidence after processing batch
+                if created_or_linked:
+                    # Use a placeholder evidence list; real integration will provide tiers/dates
+                    conf = compute_event_confidence([{"source_tier": "C", "published_at": None}])
+                    for ev in session.query(EventORM).all():
+                        if ev.confidence is None:
+                            ev.confidence = conf
+                session.commit()
+
             return {
                 "source_key": f"{source_config.get('publisher')}:{source_config.get('url')}",
                 "articles_count": len(articles),

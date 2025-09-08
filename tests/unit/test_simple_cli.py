@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, patch
 
 from click.testing import CliRunner
 
-from src.cli.commands.simple import simple_pipeline
+from cli.commands.simple import simple_pipeline
 
 
 class TestSimplePipelineCommand:
@@ -19,7 +19,7 @@ class TestSimplePipelineCommand:
         ]
 
         with patch(
-            "src.cli.commands.simple.run_simplified_pipeline", new_callable=AsyncMock
+            "cli.commands.simple.run_simplified_pipeline", new_callable=AsyncMock
         ) as mock_run:
             mock_run.return_value = async_results
 
@@ -42,7 +42,7 @@ class TestSimplePipelineCommand:
 
         with (
             patch(
-                "src.cli.commands.simple.run_simplified_pipeline", new_callable=AsyncMock
+                "cli.commands.simple.run_simplified_pipeline", new_callable=AsyncMock
             ) as mock_run,
             patch.dict(
                 os.environ,

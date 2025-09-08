@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from click.testing import CliRunner
 
-from src.cli.commands.pipeline import pipeline as pipeline_cmd
+from cli.commands.pipeline import pipeline as pipeline_cmd
 
 
 def test_pipeline_cli_invokes_run(monkeypatch, tmp_path):
@@ -27,7 +27,7 @@ sources:
             return {"total": 0, "kept": 0, "rejected": 0, "escalated": 0}
 
     # Patch Pipeline constructor in the command module scope
-    monkeypatch.setattr("src.cli.commands.pipeline.Pipeline", lambda: FakePipeline())
+    monkeypatch.setattr("cli.commands.pipeline.Pipeline", lambda: FakePipeline())
 
     runner = CliRunner()
     res = runner.invoke(pipeline_cmd, ["--config", str(cfg), "--only-publisher", "ESPN"])

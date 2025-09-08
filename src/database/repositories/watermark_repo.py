@@ -3,23 +3,10 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import DateTime, String, UniqueConstraint
-from sqlalchemy.orm import Mapped, Session, mapped_column, sessionmaker
+from sqlalchemy.orm import Session, sessionmaker
 
-from ...models.database import Base
-from ..connection import get_sessionmaker
-
-
-class SourceWatermarkORM(Base):
-    __tablename__ = "source_watermarks"
-    __table_args__ = (UniqueConstraint("source_key", name="uq_source_watermarks_source_key"),)
-
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    source_key: Mapped[str] = mapped_column(String(255), nullable=False)
-    last_publication_date: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True), nullable=True
-    )
-    last_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+from database.connection import get_sessionmaker
+from models.database import SourceWatermarkORM
 
 
 class WatermarkRepository:

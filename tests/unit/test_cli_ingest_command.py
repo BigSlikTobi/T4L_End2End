@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 
 from click.testing import CliRunner
 
-from src.cli.commands.ingest import ingest as ingest_cmd
+from cli.commands.ingest import ingest as ingest_cmd
 
 
 def test_ingest_rss_path(monkeypatch):
@@ -20,7 +20,7 @@ def test_ingest_rss_path(monkeypatch):
             ]
 
     # Patch constructor in module scope
-    monkeypatch.setattr("src.cli.commands.ingest.FeedIngester", lambda: FakeFI())
+    monkeypatch.setattr("cli.commands.ingest.FeedIngester", lambda: FakeFI())
 
     runner = CliRunner()
     result = runner.invoke(ingest_cmd, ["--url", "http://example.com/rss", "--type", "rss"])
@@ -40,8 +40,8 @@ def test_ingest_sitemap_path(monkeypatch):
             {"url": "http://x/3", "lastmod": "2025-09-07T02:00:00Z"},
         ]
 
-    monkeypatch.setattr("src.cli.commands.ingest.fetch_sitemap", fake_fetch)
-    monkeypatch.setattr("src.cli.commands.ingest.parse_sitemap", fake_parse)
+    monkeypatch.setattr("cli.commands.ingest.fetch_sitemap", fake_fetch)
+    monkeypatch.setattr("cli.commands.ingest.parse_sitemap", fake_parse)
 
     runner = CliRunner()
     result = runner.invoke(ingest_cmd, ["--url", "http://example.com/sm.xml", "--type", "sitemap"])
