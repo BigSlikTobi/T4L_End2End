@@ -41,4 +41,5 @@ def test_dedup_clustering_within_5_days(tmp_path, monkeypatch):
     Pending implementation of event clustering and confidence computation, mark xfail.
     """
     import pytest
+
     pytest.xfail("Pending clustering and confidence (T013–T014)")

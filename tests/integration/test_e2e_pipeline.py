@@ -87,13 +87,13 @@ def test_article_to_event_happy_path(tmp_path, monkeypatch):
 
         pytest.xfail(f"Pending event repos and services (T010–T016, T021): {e}")
 
-    # If repos exist, attempt an end-to-end minimal flow
+        # If repos exist, attempt an end-to-end minimal flow
         db = tmp_path / "test_events.db"
         monkeypatch.setenv("DATABASE_URL", f"sqlite:///{db}")
 
         cfg_path = tmp_path / "feeds.yaml"
         cfg_path.write_text(
-                """
+            """
 version: 1
 sources:
     - name: Test RSS
@@ -103,7 +103,7 @@ sources:
         nfl_only: true
         enabled: true
                 """,
-                encoding="utf-8",
+            encoding="utf-8",
         )
 
     from unittest.mock import Mock, patch

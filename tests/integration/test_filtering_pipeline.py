@@ -21,4 +21,5 @@ def test_allowlisted_claim_extraction_with_provenance(monkeypatch):
     Pending claim extraction service.
     """
     import pytest
+
     pytest.xfail("Pending claim extraction and provenance recording (T015–T021)")

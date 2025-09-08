@@ -24,7 +24,7 @@ def test_list_events_function_signature_matches_contract():
     params = list(sig.parameters.values())
     # list_events(team_id: Optional[str] = None, player_id: Optional[str] = None,
     #             type: Optional[str] = None, min_confidence: Optional[int] = None)
-    assert len(params) == 5, "list_events(selfless, team_id, player_id, type, min_confidence) expected"
+    assert len(params) == 4, "list_events(team_id, player_id, type, min_confidence) expected"
     assert params[0].name == "team_id"
     assert params[1].name == "player_id"
     assert params[2].name == "type"
@@ -35,7 +35,14 @@ def test_list_events_function_signature_matches_contract():
     assert hints.get("team_id") in (Optional[str], str, None), "team_id should be Optional[str]"
     assert hints.get("player_id") in (Optional[str], str, None), "player_id should be Optional[str]"
     assert hints.get("type") in (Optional[str], str, None), "type should be Optional[str]"
-    assert hints.get("min_confidence") in (Optional[int], int, None), "min_confidence should be Optional[int]"
+    assert hints.get("min_confidence") in (
+        Optional[int],
+        int,
+        None,
+    ), "min_confidence should be Optional[int]"
 
     ret = hints.get("return")
-    assert ret in (List[Dict[str, Any]], list), "list_events should return List[Dict[str, Any]] per contract"
+    assert ret in (
+        List[Dict[str, Any]],
+        list,
+    ), "list_events should return List[Dict[str, Any]] per contract"
